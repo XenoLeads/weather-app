@@ -6,5 +6,109 @@
     <meta name="author" content="Xeno" />
     <title>Weather App</title>
   </head>
-  <body></body>
+  <body>
+    <div class="spotlights">
+      <div class="spotlight spotlight-1"></div>
+      <div class="spotlight spotlight-2"></div>
+      <div class="spotlight spotlight-3"></div>
+    </div>
+    <div id="container">
+      <header>
+        <div class="logo-name">
+          <img src="../assets/images/logo.png" alt="" class="logo" draggable="false" />
+          <h1 class="name">Xeno</h1>
+        </div>
+        <div class="search-bar">
+          <button class="button-search search-button">
+            <img src="../assets/icons/search.svg" alt="" class="search-icon" draggable="false" />
+          </button>
+          <input type="search" name="search" id="search" />
+          <button class="button-search clear-search-button">
+            <img src="../assets/icons/clear.svg" alt="" class="search-icon" draggable="false" />
+          </button>
+        </div>
+        <button class="unit-conversion-button">
+          <img src="../assets/icons/unit-conversion.svg" alt="" class="unit-conversion-icon" draggable="false" />
+        </button>
+      </header>
+      <main>
+        <section class="selected-weather-forecast">
+          <h2 class="location-name">Location</h2>
+          <section class="temperatures-icon-day-time">
+            <div class="day-time">
+              <p class="day">Day</p>
+              <p class="time">—:— —</p>
+            </div>
+            <section class="temperature-icon">
+              <div class="temperatures">
+                <p class="min-max-temperature">—°C / —°C</p>
+                <p class="temperature">—°C</p>
+                <p class="feelslike-temperature">Feels-like —°C</p>
+              </div>
+              <img src="../assets/icons/weather/partly-cloudy-day.svg" alt="" class="selected-weather-icon" />
+            </section>
+          </section>
+          <p class="selected-weather-condition">Weather Conditon</p>
+          <button id="details-button">Details</button>
+        </section>
+        <section class="forecast">
+          <nav class="forecast-toggle">
+            <button id="daily-button" class="forecast-toggle-button selected">Daily</button>
+            <button id="hourly-button" class="forecast-toggle-button">Hourly</button>
+          </nav>
+          <ul class="forecast-list">
+            <li>
+              <button class="forecast-item selected">
+                <p class="forecast-temperature">--°C</p>
+                <img src="../assets/icons/weather/partly-cloudy-day.svg" alt="" class="forecast-icon" draggable="false" />
+                <p class="forecast-day">Day</p>
+              </button>
+            </li>
+            <li>
+              <button class="forecast-item">
+                <p class="forecast-temperature">--°C</p>
+                <img src="../assets/icons/weather/partly-cloudy-day.svg" alt="" class="forecast-icon" draggable="false" />
+                <p class="forecast-day">Day</p>
+              </button>
+            </li>
+            <li>
+              <button class="forecast-item">
+                <p class="forecast-temperature">--°C</p>
+                <img src="../assets/icons/weather/partly-cloudy-day.svg" alt="" class="forecast-icon" draggable="false" />
+                <p class="forecast-day">Day</p>
+              </button>
+            </li>
+            <li>
+              <button class="forecast-item">
+                <p class="forecast-temperature">--°C</p>
+                <img src="../assets/icons/weather/partly-cloudy-day.svg" alt="" class="forecast-icon" draggable="false" />
+                <p class="forecast-day">Day</p>
+              </button>
+            </li>
+            <li>
+              <button class="forecast-item">
+                <p class="forecast-temperature">--°C</p>
+                <img src="../assets/icons/weather/partly-cloudy-day.svg" alt="" class="forecast-icon" draggable="false" />
+                <p class="forecast-day">Day</p>
+              </button>
+            </li>
+            <li>
+              <button class="forecast-item">
+                <p class="forecast-temperature">--°C</p>
+                <img src="../assets/icons/weather/partly-cloudy-day.svg" alt="" class="forecast-icon" draggable="false" />
+                <p class="forecast-day">Day</p>
+              </button>
+            </li>
+            <li>
+              <button class="forecast-item">
+                <p class="forecast-temperature">--°C</p>
+                <img src="../assets/icons/weather/partly-cloudy-day.svg" alt="" class="forecast-icon" draggable="false" />
+                <p class="forecast-day">Day</p>
+              </button>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+  </body>
 </html>
