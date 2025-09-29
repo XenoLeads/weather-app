@@ -180,7 +180,7 @@ main {
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  flex: 1;
+  flex: 2;
 }
 .location-name {
   font-weight: 400;
@@ -240,6 +240,7 @@ main {
 .forecast {
   display: flex;
   flex-direction: column;
+  flex: 1;
   gap: 1rem;
 }
 .forecast-toggle {
@@ -450,5 +451,176 @@ main {
   }
   .forecast-icon {
     height: 4rem;
+  }
+}
+
+/* Desktop */
+.desktop-details-section {
+  display: none;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  height: 20rem;
+  width: 30rem;
+  border: 2px solid white;
+  padding: 1rem 2rem;
+  gap: 1rem;
+}
+.desktop-details-heading-location {
+  border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+  width: 100%;
+  text-align: center;
+  font-weight: 400;
+  padding-bottom: 0.4rem;
+}
+.desktop-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  flex: 1;
+  justify-items: flex-start;
+  align-items: center;
+  width: 100%;
+  gap: 0 2rem;
+}
+.desktop-detail {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+  padding: 0.4rem;
+}
+.weather-desktop-detail-icon {
+  width: 2rem;
+  aspect-ratio: 1/1;
+  object-fit: contain;
+}
+.desktop-detail:nth-of-type(2) > .weather-desktop-detail-icon,
+.desktop-detail:nth-of-type(5) > .weather-desktop-detail-icon,
+.desktop-detail:nth-of-type(6) > .weather-desktop-detail-icon,
+.desktop-detail:nth-of-type(7) > .weather-desktop-detail-icon {
+  padding: 0.2rem;
+}
+@media screen and (min-width: 769px) {
+  main {
+    justify-content: stretch;
+    align-items: stretch;
+    --outline-radius: 0.4rem;
+    --outline-background-color: rgba(255, 255, 255, 0.1);
+    gap: 1rem;
+  }
+  .logo {
+    height: 3rem;
+  }
+  .name {
+    font-size: 1.5rem;
+  }
+  .search-bar {
+    height: 80%;
+    width: 50%;
+    flex: 0 0 auto;
+  }
+  #search {
+    padding: 0 2.2rem;
+    font-size: 1.4rem;
+  }
+  .button-search {
+    height: 1.2rem;
+  }
+  .unit-conversion-button {
+    height: 2.5rem;
+  }
+  .location-name,
+  #details-button,
+  .selected-weather-condition,
+  .selected-weather-icon {
+    display: none;
+  }
+  .selected-weather-icon-condition {
+    display: flex;
+  }
+  .selected-weather-icon-condition > .selected-weather-condition,
+  .selected-weather-icon-condition > .selected-weather-icon {
+    display: block;
+  }
+  .temperatures-icon-day-time {
+    border: 2px solid white;
+    padding: 1rem;
+    height: 100%;
+    border-radius: var(--outline-radius);
+    background-color: var(--outline-background-color);
+    justify-content: flex-start;
+    flex: 1.8;
+  }
+  .selected-weather-forecast {
+    flex-direction: row;
+    justify-content: stretch;
+    gap: 1rem;
+  }
+  .desktop-details-section {
+    display: flex;
+    flex: 1;
+    height: 100%;
+    border-radius: var(--outline-radius);
+    background-color: var(--outline-background-color);
+  }
+  .day-time {
+    font-size: 1.8rem;
+  }
+  .selected-weather-icon-condition {
+    padding: 1rem;
+    gap: 1rem;
+  }
+  .selected-weather-icon-condition > .selected-weather-icon {
+    height: 10rem;
+  }
+  .min-max-temperature {
+    font-size: 1.5rem;
+  }
+  .temperature {
+    font-size: 5rem;
+  }
+  .temperature-icon {
+    margin: unset;
+    justify-content: space-around;
+    flex: 1;
+  }
+  .temperatures {
+    margin-bottom: 1.5rem;
+  }
+  .feelslike-temperature {
+    font-size: 1.8rem;
+  }
+  .forecast {
+    position: relative;
+  }
+  .forecast-list {
+    align-items: flex-end;
+    flex: 1;
+    border-radius: var(--outline-radius);
+    background-color: var(--outline-background-color);
+  }
+  .forecast-toggle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin-top: unset;
+    width: fit-content;
+    margin-left: 1rem;
+    gap: unset;
+  }
+  .forecast-toggle-button {
+    border-radius: unset;
+    padding: 0.4rem 1rem;
+  }
+  #daily-button {
+    border-bottom-left-radius: 0.4rem;
+  }
+  #hourly-button {
+    border-bottom-right-radius: 0.4rem;
+  }
+  .forecast-item {
+    height: 8rem;
   }
 }
