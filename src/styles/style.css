@@ -201,6 +201,7 @@ main {
   flex-direction: column;
   justify-content: space-between;
   width: 100%;
+  white-space: nowrap;
 }
 .temperature-icon {
   display: flex;
@@ -221,6 +222,7 @@ main {
 }
 .selected-weather-icon {
   height: 5rem;
+  width: 100%;
 }
 .selected-weather-condition {
   text-align: center;
