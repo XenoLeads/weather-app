@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="author" content="Xeno" />
-    <link rel="icon" type="image/x-icon" href="../assets/icons/weather/partly-cloudy-day.svg">
+    <link rel="icon" type="image/x-icon" href="../assets/icons/weather/partly-cloudy-day.svg" />
     <title>Weather App</title>
   </head>
   <body>
@@ -23,10 +23,11 @@
           <button class="button-search search-button">
             <img src="../assets/icons/search.svg" alt="" class="search-icon" draggable="false" />
           </button>
-          <input type="search" name="search" id="search" />
+          <input type="search" name="search" id="search" list="search-suggestions" />
           <button class="button-search clear-search-button">
             <img src="../assets/icons/clear.svg" alt="" class="search-icon" draggable="false" />
           </button>
+          <datalist id="search-suggestions"> </datalist>
         </div>
         <button class="unit-conversion-button">
           <img src="../assets/icons/unit-conversion.svg" alt="" class="unit-conversion-icon" draggable="false" />
@@ -52,10 +53,10 @@
                 <p class="feelslike-temperature">Feels-like —°C</p>
               </div>
               <div class="selected-weather-icon-condition">
-                <img src="../assets/icons/weather/partly-cloudy-day.svg" alt="" class="selected-weather-icon" draggable="false"/>
+                <img src="../assets/icons/weather/partly-cloudy-day.svg" alt="" class="selected-weather-icon" draggable="false" />
                 <p class="selected-weather-condition">Weather Conditon</p>
               </div>
-              <img src="../assets/icons/weather/partly-cloudy-day.svg" alt="" class="selected-weather-icon" draggable="false"/>
+              <img src="../assets/icons/weather/partly-cloudy-day.svg" alt="" class="selected-weather-icon" draggable="false" />
             </section>
           </section>
           <section class="desktop-details-section">
