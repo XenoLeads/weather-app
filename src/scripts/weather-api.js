@@ -155,7 +155,7 @@ function formatWeatherData(data) {
       }
     }
   }
-  // Copy missing properties from daily weather data
+  // Copy unavailable properties from daily weather data
   const hourly_keys = Object.keys(formattedData.daily[0].hourly[0]);
   for (const key in formattedData.daily[0]) {
     if (!hourly_keys.includes(key) && key !== "hourly") {
@@ -175,6 +175,17 @@ function formatWeatherData(data) {
       formattedData.current[keyMap[key]] = WEATHER_CODES[data.current[key]];
     } else if (keyMap[key]) {
       formattedData.current[keyMap[key]] = data.current[key];
+    }
+  }
+  // Copy unavailable properties from daily weather data
+  const current_keys = Object.keys(formattedData.current);
+  for (const key in formattedData.daily[0]) {
+    if (!current_keys.includes(key) && key !== "hourly") {
+      for (let i = 0; i < formattedData.daily.length; i++) {
+        for (let j = 0; j < formattedData.daily[i].hourly.length; j++) {
+          formattedData.current[key] = formattedData.daily[i][key];
+        }
+      }
     }
   }
 
@@ -201,6 +212,13 @@ function formatWeatherData(data) {
       formattedData.current_units[keyMap[key]] = data.current_units[key];
     }
   }
+  // Copy unavailable properties from daily_units weather data
+  const current_units_keys = Object.keys(formattedData.current_units);
+  for (const key in formattedData.daily_units) {
+    if (!current_units_keys.includes(key)) {
+      formattedData.current_units[key] = formattedData.daily_units[key];
+    }
+  }
 
   // Format hourly weather data units
   for (const key in data.hourly_units) {
@@ -210,7 +228,7 @@ function formatWeatherData(data) {
       formattedData.hourly_units[keyMap[key]] = data.hourly_units[key];
     }
   }
-  // Copy missing properties from daily weather data
+  // Copy unavailable properties from daily weather data
   const hourly_units_keys = Object.keys(formattedData.hourly_units);
   for (const key in formattedData.daily_units) {
     if (!hourly_units_keys.includes(key)) {
