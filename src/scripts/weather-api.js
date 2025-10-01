@@ -77,11 +77,12 @@ async function getWeatherData(locationName) {
     `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_min,temperature_2m_max,temperature_2m_mean,apparent_temperature_mean,relative_humidity_2m_mean,surface_pressure_mean,wind_speed_10m_mean,sunrise,sunset,uv_index_max,wind_direction_10m_dominant,precipitation_probability_mean,weather_code&hourly=temperature_2m,apparent_temperature,weather_code,relative_humidity_2m,surface_pressure,wind_speed_10m,precipitation_probability,uv_index,wind_direction_10m&current=relative_humidity_2m,temperature_2m,apparent_temperature,precipitation,wind_speed_10m,wind_direction_10m,weather_code,surface_pressure&timezone=${timezone}`
   );
   const weatherResponseJson = await weatherResponse.json();
+  weatherResponseJson.location = locationData[0].name;
   return weatherResponseJson;
 }
 
 function formatWeatherData(data) {
-  const formattedData = { current: {}, current_units: {}, daily: [], daily_units: {}, hourly_units: {} };
+  const formattedData = { location: data.location, current: {}, current_units: {}, daily: [], daily_units: {}, hourly_units: {} };
   for (let i = 0; i < data.daily.weather_code.length; i++) formattedData.daily.push({ hourly: [] });
   for (let i = 0; i < formattedData.daily.length; i++) {
     for (let j = 0; j < 24; j++) {
@@ -216,9 +217,11 @@ function formatWeatherData(data) {
       formattedData.hourly_units[key] = formattedData.daily_units[key];
     }
   }
+  return formattedData;
 }
 
 export default {
   geocode: getGeocode,
   get: getWeatherData,
+  format: formatWeatherData,
 };
