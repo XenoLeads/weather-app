@@ -176,6 +176,9 @@ function formatWeatherData(data) {
     } else if (keyMap[key] === "condition") {
       formattedData.current[keyMap[key]] = WEATHER_CODES[data.current[key]];
       formattedData.current[key] = data.current[key];
+    } else if (key === "time") {
+      formattedData.current[keyMap[key]] = data.current[key];
+      formattedData.current.date = data.current.time.split("T")[0];
     } else if (keyMap[key]) {
       formattedData.current[keyMap[key]] = data.current[key];
     }
