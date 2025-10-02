@@ -65,7 +65,7 @@ function showSuggestions(location_name) {
   const local_weather_data = JSON.parse(localStorage.getItem("weather_data"));
   if (local_weather_data) {
     weather_data = local_weather_data;
-    displayWeatherData(Weather.format(weather_data), forecastList);
+    displayWeatherData(Weather.format(weather_data), forecastList, true);
   }
 
   // Show suggestions after typing
@@ -88,7 +88,7 @@ function showSuggestions(location_name) {
           localStorage.setItem("weather_data", JSON.stringify(response));
           weather_data = response;
           searchInput.value = "";
-          displayWeatherData(Weather.format(response), forecastList);
+          displayWeatherData(Weather.format(response), forecastList, true);
         })
         .catch(error => {
           console.error(error);
@@ -101,11 +101,13 @@ function showSuggestions(location_name) {
   daily_button.addEventListener("click", () => {
     hourly_button.classList.remove("selected");
     daily_button.classList.add("selected");
+    forecastList.dataset.forecastList = 0;
     displayWeatherForecasts(Weather.format(weather_data), forecastList);
   });
   hourly_button.addEventListener("click", () => {
     daily_button.classList.remove("selected");
     hourly_button.classList.add("selected");
+    forecastList.dataset.forecastList = 1;
     displayWeatherForecasts(Weather.format(weather_data), forecastList, false);
   });
 })();
@@ -116,11 +118,11 @@ function getDirectionText(degrees) {
   return DIRECTIONS[index];
 }
 
-function displayWeatherData(data, forecast_list_DOM_container = null) {
+function displayWeatherData(data, forecast_list_DOM_container, display_forecast_list = false) {
   const selected_list = parseInt(forecast_list_DOM_container.dataset.forecastList);
   const day_index = parseInt(forecast_list_DOM_container.dataset.day);
   const hour_index = parseInt(forecast_list_DOM_container.dataset.hour);
-  const days = [...document.querySelectorAll("[data-day]")];
+  const days = [...document.querySelectorAll("[data-day]:not(.forecast-list)")];
   const times = [...document.querySelectorAll("[data-time]")];
   const locations = [...document.querySelectorAll("[data-location]")];
   const min_max_temperature = document.querySelector("[data-min-max-temperature]");
@@ -135,42 +137,69 @@ function displayWeatherData(data, forecast_list_DOM_container = null) {
   const wind_direction = [...document.querySelectorAll("[data-wind-direction]")];
   const sunrise = [...document.querySelectorAll("[data-sunrise]")];
   const sunset = [...document.querySelectorAll("[data-sunset]")];
-  console.log(data);
-  const current_config = [
-    [days, format.weekday(data.current.time)],
-    [times, format.time(data.current.time, true)],
+  let forecast;
+  let forecast_units;
+  let is_current_forecast_unique = isCurrentForecastUnique(data.daily[0].hourly, data.current);
+  if (selected_list === -1) {
+    if (is_current_forecast_unique === -1) {
+      forecast = data.daily[day_index];
+      forecast_units = data.daily_units;
+      forecast_list_DOM_container.dataset.forecastList = 0;
+    } else {
+      forecast = data.current;
+      forecast_units = data.current_units;
+      forecast_list_DOM_container.dataset.forecastList = -1;
+    }
+  } else if (selected_list === 0) {
+    forecast = data.daily[day_index];
+    forecast_units = data.daily_units;
+  } else {
+    if (hour_index === -1) {
+      if (is_current_forecast_unique === -1) {
+        fallback_hour_index = parseInt(new Date().toLocaleTimeString().split(":")[0]);
+        forecast = data.daily[day_index].hourly[fallback_hour_index];
+        forecast_units = data.hourly_units;
+      } else {
+        forecast = data.current;
+        forecast_units = data.current_units;
+      }
+    } else {
+      forecast = data.daily[day_index].hourly[hour_index];
+      forecast_units = data.hourly_units;
+    }
+  }
+
+  const config = [
+    [days, format.weekday(forecast.date)],
+    [times, forecast.time ? format.time(forecast.time, true) : format.date(forecast.date)],
     [locations, data.location],
     [
       min_max_temperature,
-      `${data.current.temperature_min}${data.current_units.temperature_min} / ${data.current.temperature_max}${data.current_units.temperature_max}`,
+      `${forecast.temperature_min}${forecast_units.temperature_min} / ${forecast.temperature_max}${forecast_units.temperature_max}`,
     ],
-    [temperature, `${data.current.temperature}${data.current_units.temperature}`],
-    [feelslike_temperature, `Feels-like ${data.current.temperature_feelslike}${data.current_units.temperature_feelslike}`],
-    [weather_condition, data.current.condition],
-    [humidity, `${data.current.humidity}${data.current_units.humidity}`],
-    [precipitation, `${data.current.precipitation}${data.current_units.precipitation}`],
-    [pressure, `${data.current.pressure} ${data.current_units.pressure}`],
-    [uv_index, `${data.current.uv_index} ${data.current_units.uv_index}`],
-    [wind_speed, `${data.current.wind_speed} ${data.current_units.wind_speed}`],
-    [wind_direction, getDirectionText(data.current.wind_direction)],
-    [sunrise, format.time(data.current.sunrise, true)],
-    [sunset, format.time(data.current.sunset, true)],
+    [temperature, `${forecast.temperature}${forecast_units.temperature}`],
+    [feelslike_temperature, `Feels-like ${forecast.temperature_feelslike}${forecast_units.temperature_feelslike}`],
+    [weather_condition, forecast.condition],
+    [humidity, `${forecast.humidity}${forecast_units.humidity}`],
+    [precipitation, `${forecast.precipitation}${forecast_units.precipitation}`],
+    [pressure, `${forecast.pressure} ${forecast_units.pressure}`],
+    [uv_index, `${forecast.uv_index} ${forecast_units.uv_index}`],
+    [wind_speed, `${forecast.wind_speed} ${forecast_units.wind_speed}`],
+    [wind_direction, getDirectionText(forecast.wind_direction)],
+    [sunrise, format.time(forecast.sunrise, true)],
+    [sunset, format.time(forecast.sunset, true)],
   ];
 
-  // 0 = daily forecast, otherwise hourly forecast
-  if (selected_list === 0) {
-    // Display current weather data if the day index is 0 and hour index is -1
-    if (day_index === 0 && hour_index === -1) {
-      setTextContent(current_config);
-      Icon.get(data.current.weather_code).then(icon_URL => {
-        selected_weather_icon.forEach(icon => (icon.src = icon_URL.default));
-      });
+  setTextContent(config);
+  Icon.get(forecast.weather_code).then(icon_URL => {
+    selected_weather_icon.forEach(icon => (icon.src = icon_URL.default));
+  });
+  if (display_forecast_list) {
+    if (selected_list !== -1 && selected_list !== 0) {
+      displayWeatherForecasts(data, forecast_list_DOM_container, false);
+    } else {
+      displayWeatherForecasts(data, forecast_list_DOM_container);
     }
-    // Show daily forecast list
-    displayWeatherForecasts(data, forecast_list_DOM_container);
-  } else {
-    // Show hourly forecast list
-    displayWeatherForecasts(data, forecast_list_DOM_container, false);
   }
 
   function setTextContent(configs) {
@@ -207,6 +236,7 @@ function displayWeatherForecasts(data, forecast_list_DOM_container, isDaily = tr
     const today_label = document.querySelector(`.forecast-item[data-index="0"] .forecast-day`);
     today_label.textContent = "Today";
   }
+
   // Display dourly forecast
   else {
     const day_index = parseInt(forecast_list_DOM_container.dataset.day);
@@ -233,7 +263,6 @@ function displayWeatherForecasts(data, forecast_list_DOM_container, isDaily = tr
       const insertingIndexElement = [...forecast_list_DOM_container.children][current_index];
       const current_forecast = createDOMForecast(data.current, -1, forecast_list_DOM_container, false);
       insertingIndexElement.after(current_forecast);
-      current_forecast.classList.add("selected");
     }
 
     // Select current selected forecast
@@ -259,25 +288,30 @@ function createDOMForecast(forecast, forecast_index, forecast_list_DOM_container
   button.classList.add("forecast-item");
   button.dataset.index = forecast_index;
   if (isDaily) {
+    button.dataset.daily = "";
     button.addEventListener("click", () => {
+      forecast_list_DOM_container.dataset.forecastList = 0;
       forecast_list_DOM_container.dataset.day = forecast_index;
       [...forecast_list_DOM_container.getElementsByClassName("forecast-item")].forEach(forecast_item =>
         forecast_item.classList.remove("selected")
       );
       const selected_day = document.querySelector(`.forecast-item[data-index="${forecast_index}"]`);
       if (selected_day) selected_day.classList.add("selected");
+      handleForecastDisplay(forecast_index, isDaily);
     });
   } else {
+    button.dataset.hourly = "";
     button.addEventListener("click", () => {
+      forecast_list_DOM_container.dataset.forecastList = 1;
       forecast_list_DOM_container.dataset.hour = forecast_index;
       [...forecast_list_DOM_container.getElementsByClassName("forecast-item")].forEach(forecast_item =>
         forecast_item.classList.remove("selected")
       );
       const selected_hour = document.querySelector(`.forecast-item[data-index="${forecast_index}"]`);
       if (selected_hour) selected_hour.classList.add("selected");
+      handleForecastDisplay(forecast_index, isDaily);
     });
   }
-  li.appendChild(button);
   const temperature = document.createElement("p");
   temperature.classList.add("forecast-temperature");
   temperature.textContent = `${forecast.temperature}°C`;
@@ -306,5 +340,32 @@ function createDOMForecast(forecast, forecast_index, forecast_list_DOM_container
     time.textContent = format.time(forecast.time, true);
     button.appendChild(time);
   }
+  li.appendChild(button);
   return li;
+}
+
+function isCurrentForecastUnique(forecast_list, current_forecast) {
+  const [cHour, cMinute] = current_forecast.time
+    .split("T")[1]
+    .split(":")
+    .map(time => parseInt(time));
+  const closest_time_index = forecast_list.findIndex(forecast => {
+    const [hour, minute] = forecast.time
+      .split("T")[1]
+      .split(":")
+      .map(time => parseInt(time));
+    return hour === cHour && minute !== cMinute;
+  });
+  if (closest_time_index === -1) return false;
+  return closest_time_index;
+}
+
+function handleForecastDisplay(forecast_index, isDaily) {
+  if (isDaily) {
+    forecastList.dataset.day = forecast_index;
+    displayWeatherData(Weather.format(weather_data), forecastList);
+  } else {
+    forecastList.dataset.hour = forecast_index;
+    displayWeatherData(Weather.format(weather_data), forecastList);
+  }
 }
