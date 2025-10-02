@@ -277,7 +277,8 @@ function displayWeatherForecasts(data, forecast_list_DOM_container, isDaily = tr
       const hour_index = parseInt(new Date().toLocaleTimeString().split(":")[0]);
       selected_hour = document.querySelector(`.forecast-item[data-index="${hour_index}"]`);
     }
-    selected_hour.classList.add("selected");
+    const DOM_hour_index = parseInt(forecast_list_DOM_container.dataset.hour);
+    if (DOM_hour_index !== -2) selected_hour.classList.add("selected");
     selected_hour.scrollIntoView({ behavior: "smooth", inline: "center" });
   }
 }
@@ -292,6 +293,7 @@ function createDOMForecast(forecast, forecast_index, forecast_list_DOM_container
     button.addEventListener("click", () => {
       forecast_list_DOM_container.dataset.forecastList = 0;
       forecast_list_DOM_container.dataset.day = forecast_index;
+      forecast_list_DOM_container.dataset.hour = -2;
       [...forecast_list_DOM_container.getElementsByClassName("forecast-item")].forEach(forecast_item =>
         forecast_item.classList.remove("selected")
       );
