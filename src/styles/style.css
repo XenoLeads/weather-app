@@ -272,9 +272,13 @@ main {
   border: 2px solid white;
   border-radius: 0.4rem;
   padding: 1rem;
+  padding-bottom: 0.35rem;
   display: flex;
   gap: 1rem;
-  overflow-x: auto;
+  overflow-x: scroll;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(181, 234, 255, 0.8) rgba(0, 0, 0, 0.2);
+  scrollbar-gutter: stable ;
 }
 .forecast-list > li {
   list-style: none;
