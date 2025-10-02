@@ -122,6 +122,7 @@ function formatWeatherData(data) {
       if (keyMap[key] === "condition") {
         for (let i = 0; i < data.daily[key].length; i++) {
           formattedData.daily[i][keyMap[key]] = WEATHER_CODES[data.daily[key][i]];
+          formattedData.daily[i][key] = data.daily[key][i];
         }
       } else if (keyMap[key] === "time") {
         for (let i = 0; i < data.daily[key].length; i++) {
@@ -143,6 +144,7 @@ function formatWeatherData(data) {
           const weather_codes = data.hourly[key].slice(i * 24, i * 24 + 24);
           for (let j = 0; j < formattedData.daily[i].hourly.length; j++) {
             formattedData.daily[i].hourly[j][keyMap[key]] = WEATHER_CODES[weather_codes[j]];
+            formattedData.daily[i].hourly[j][key] = weather_codes[j];
           }
         }
       } else {
@@ -173,6 +175,7 @@ function formatWeatherData(data) {
       formattedData.current[keyMap[key]] = formattedData.daily[0][keyMap[key]];
     } else if (keyMap[key] === "condition") {
       formattedData.current[keyMap[key]] = WEATHER_CODES[data.current[key]];
+      formattedData.current[key] = data.current[key];
     } else if (keyMap[key]) {
       formattedData.current[keyMap[key]] = data.current[key];
     }
