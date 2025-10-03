@@ -113,9 +113,6 @@ header {
   height: 1.8rem;
   flex: 1;
 }
-.search-bar > input[type="search"]::-webkit-search-cancel-button {
-  display: none;
-}
 .search-bar > input[type="search"] {
   width: 100%;
   height: 100%;
@@ -125,6 +122,24 @@ header {
   border-radius: 4rem;
   color: white;
   padding: 0 1.4rem;
+}
+/* Hide native search clear button */
+.search-bar > input[type="search"]::-webkit-search-cancel-button {
+  display: none;
+}
+/* Hide dropdown icon from input */
+/* For Webkit browsers (Chrome, Safari, Opera) */
+.search-bar > input[type="search"]::-webkit-calendar-picker-indicator {
+  display: none !important;
+}
+/* For Firefox */
+.search-bar > input[type="search"] {
+  -moz-appearance: none !important;
+  appearance: none !important; /* Standard property for cross-browser compatibility */
+}
+/* For Internet Explorer 10+ */
+.search-bar > input[type="search"]::-ms-expand {
+  display: none !important;
 }
 .button-search {
   position: absolute;
