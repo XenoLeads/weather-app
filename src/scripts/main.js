@@ -61,6 +61,12 @@ function showSuggestions(location_name) {
 
 // Initialization IIFE
 (() => {
+  // Add keyboard support
+  window.addEventListener("keydown", e => {
+    const pressed_key = e.key.toLowerCase();
+    if (pressed_key === "enter") searchButton.click();
+  });
+
   // Display locally cached weather data if available
   const local_weather_data = JSON.parse(localStorage.getItem("weather_data"));
   if (local_weather_data) {
@@ -89,6 +95,7 @@ function showSuggestions(location_name) {
           weather_data = response;
           searchInput.value = "";
           displayWeatherData(Weather.format(response), forecastList, true);
+          searchInput.blur();
         })
         .catch(error => {
           console.error(error);
