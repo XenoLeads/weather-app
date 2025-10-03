@@ -96,6 +96,11 @@ function updateScreenLabel() {
   window.addEventListener("resize", updateScreenLabel);
   updateScreenLabel();
 
+  // Fix elements' animation on initial load
+  window.onload = () => {
+    container.removeAttribute("style");
+  };
+
   // Display locally cached weather data if available
   const local_weather_data = JSON.parse(localStorage.getItem("weather_data"));
   if (local_weather_data) {
