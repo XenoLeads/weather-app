@@ -774,3 +774,8 @@ main {
     height: 8rem;
   }
 }
+
+/* Inherit font-family on button */
+button{
+  font-family: inherit;
+}
