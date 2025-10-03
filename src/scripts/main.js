@@ -89,6 +89,7 @@ function updateScreenLabel() {
 (() => {
   // Add keyboard support
   window.addEventListener("keydown", e => {
+    if (!e.key) return;
     const pressed_key = e.key.toLowerCase();
     if (pressed_key === "enter") searchButton.click();
   });
