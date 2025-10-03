@@ -2,11 +2,15 @@ import "../styles/style.css";
 import Weather from "./weather-api.js";
 import Icon from "./weather-icons.js";
 
+const container = document.getElementById("container");
 const searchButton = document.getElementsByClassName("search-button")[0];
 const clearSearchButton = document.getElementsByClassName("clear-search-button")[0];
 const searchInput = document.getElementById("search");
 const searchSuggestions = document.getElementById("search-suggestions");
 const selected_weather_icon = [...document.getElementsByClassName("selected-weather-icon")];
+const mobile_details_panel_container = document.getElementsByClassName("mobile-details-panel-container")[0];
+const mobile_details_button = document.getElementsByClassName("mobile-details-button")[0];
+const mobile_details_dismiss_button = document.getElementsByClassName("mobile-details-dismiss-button")[0];
 const daily_button = document.getElementById("daily-button");
 const hourly_button = document.getElementById("hourly-button");
 const forecastList = document.getElementsByClassName("forecast-list")[0];
@@ -59,6 +63,28 @@ function showSuggestions(location_name) {
   });
 }
 
+function updateScreenLabel() {
+  if (window.innerWidth >= 481 && window.innerWidth <= 768) {
+    if (container.classList.contains("tablet")) return;
+    container.classList.add("tablet");
+    container.classList.remove("desktop");
+    container.classList.remove("mobile");
+    container.dataset.device = "tablet";
+  } else if (window.innerWidth >= 769) {
+    if (container.classList.contains("desktop")) return;
+    container.classList.add("desktop");
+    container.classList.remove("tablet");
+    container.classList.remove("mobile");
+    container.dataset.device = "desktop";
+  } else {
+    if (container.classList.contains("mobile")) return;
+    container.classList.add("mobile");
+    container.classList.remove("desktop");
+    container.classList.remove("tablet");
+    container.dataset.device = "mobile";
+  }
+}
+
 // Initialization IIFE
 (() => {
   // Add keyboard support
@@ -66,6 +92,8 @@ function showSuggestions(location_name) {
     const pressed_key = e.key.toLowerCase();
     if (pressed_key === "enter") searchButton.click();
   });
+  window.addEventListener("resize", updateScreenLabel);
+  updateScreenLabel();
 
   // Display locally cached weather data if available
   const local_weather_data = JSON.parse(localStorage.getItem("weather_data"));
@@ -102,8 +130,14 @@ function showSuggestions(location_name) {
         });
     }
   });
-
   clearSearchButton.addEventListener("click", () => (searchInput.value = ""));
+
+  mobile_details_button.addEventListener("click", () => {
+    mobile_details_panel_container.classList.add("visible");
+  });
+  mobile_details_dismiss_button.addEventListener("click", () => {
+    mobile_details_panel_container.classList.remove("visible");
+  });
 
   daily_button.addEventListener("click", () => {
     hourly_button.classList.remove("selected");
