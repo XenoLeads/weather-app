@@ -242,7 +242,7 @@ main {
 .selected-weather-condition {
   text-align: center;
 }
-#details-button {
+.mobile-details-button {
   background: none;
   outline: none;
   border: 2px solid white;
@@ -256,6 +256,114 @@ main {
 }
 .label-value > .value {
   opacity: 0.8;
+}
+/* Mobile Details Panel */
+.mobile-details-panel-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+.mobile-details-panel-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+.mobile-details-panel {
+  position: absolute;
+  border: 2px solid white;
+  height: fit-content;
+  width: 80vmin;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.4rem;
+  transform: translateY(-200%) scaleY(0);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+#container.mobile .mobile-details-panel-container.visible > .mobile-details-panel-overlay {
+  pointer-events: all;
+  opacity: 1;
+}
+#container.mobile .mobile-details-panel-container.visible > .mobile-details-panel {
+  pointer-events: all;
+  transform: translateY(0%) scaleY(1);
+  opacity: 1;
+}
+.mobile-details-heading {
+  width: 100%;
+  text-align: center;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 0.4rem;
+  font-size: 1.5rem;
+}
+.mobile-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  justify-content: space-around;
+  align-items: center;
+  padding: 1rem;
+  gap: 1.2rem;
+}
+.mobile-details > .detail {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+.mobile-details > .detail:nth-of-type(6) {
+  padding-left: 0.2rem;
+}
+.mobile-details > .detail > .weather-detail-icon {
+  height: 1rem;
+}
+.mobile-details > .detail > .label-value > .label {
+  font-size: 0.9rem;
+}
+.mobile-details > .detail > .label-value > .value {
+  font-size: 0.8rem;
+}
+.mobile-details > .detail:first-of-type > .weather-detail-icon,
+.mobile-details > .detail:nth-of-type(3) > .weather-detail-icon,
+.mobile-details > .detail:nth-of-type(4) > .weather-detail-icon,
+.mobile-details > .detail:nth-of-type(8) > .weather-detail-icon {
+  height: 1.4rem;
+}
+.mobile-details-dismiss-button {
+  background: none;
+  outline: none;
+  color: inherit;
+  font-size: inherit;
+  border: 2px solid white;
+  margin: 0.4rem 0;
+  padding: 0.4rem 1rem;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+}
+.mobile-details-dismiss-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.mobile-details-dismiss-button:active {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Forecast */
@@ -291,7 +399,6 @@ main {
   border: 2px solid white;
   border-radius: 0.4rem;
   padding: 1rem;
-  padding-bottom: 0.35rem;
   display: flex;
   gap: 1rem;
   overflow-x: scroll;
@@ -331,7 +438,7 @@ main {
 }
 
 /* Button acive and hover effects */
-#details-button:hover,
+.mobile-details-button:hover,
 .forecast-toggle-button:not(.selected):hover,
 .forecast-item:not(.selected):hover {
   background-color: rgba(255, 255, 255, 0.1);
@@ -341,7 +448,7 @@ main {
   transition: background-color 0.1s ease;
   background-color: rgba(255, 255, 255, 0.2);
 }
-#details-button:active {
+.mobile-details-button:active {
   background-color: rgba(255, 255, 255, 0.2);
 }
 
@@ -436,7 +543,7 @@ main {
   .day-time,
   .selected-weather-condition,
   .selected-weather-icon,
-  #details-button {
+  .mobile-details-button {
     display: none;
   }
   .location-day-time {
@@ -574,7 +681,7 @@ main {
     height: 2.5rem;
   }
   .location-name,
-  #details-button,
+  .mobile-details-button,
   .selected-weather-condition,
   .selected-weather-icon {
     display: none;
@@ -642,6 +749,7 @@ main {
     flex: 1;
     border-radius: var(--outline-radius);
     background-color: var(--outline-background-color);
+    padding-bottom: 0.35rem;
   }
   .forecast-toggle {
     position: absolute;
