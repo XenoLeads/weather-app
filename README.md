@@ -5,9 +5,12 @@ This project demonstrates my skills in frontend development, geocoding, API inte
 
 ## Project Status
 
-- UI design: Wireframes and mockups designed
-- Frontend development: Yet to build
-- API integration: Yet to integrate a weather API
+**Status:** Refinement Phase
+
+- ✅ **UI/UX Design:** Wireframes & mockups completed
+- ✅ **Frontend Development:** Responsive UI built
+- ✅ **API Integration:** Live data from Open-Meteo
+- 🔄 **Code Refinement:** Improving readability and adding unit conversion
 
 _This README will be updated as the project progresses._
 
