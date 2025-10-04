@@ -35,22 +35,24 @@
       </header>
       <main>
         <section class="selected-weather-forecast">
-          <h2 class="location-name" data-location>Location</h2>
+          <h2 class="location-name" data-location>[Location]</h2>
           <div class="location-day-time">
-            <h2 class="location" data-location>Location</h2>
-            <h2 class="day" data-day>Day</h2>
-            <h2 class="time" data-time>Time</h2>
+            <h2 class="location" data-location>[Location]</h2>
+            <h2 class="day" data-day>[Day]</h2>
+            <h2 class="time" data-time>[Time]</h2>
           </div>
           <section class="temperatures-icon-day-time">
             <div class="day-time">
-              <p class="day" data-day>Day</p>
-              <p class="time" data-time>—:— —</p>
+              <p class="day" data-day>[Day]</p>
+              <p class="time" data-time>[Time]</p>
             </div>
             <section class="temperature-icon">
               <div class="temperatures">
-                <p class="min-max-temperature" data-min-max-temperature>—°C / —°C</p>
-                <p class="temperature" data-temperature>—°C</p>
-                <p class="feelslike-temperature" data-feelslike-temperature>Feels-like —°C</p>
+                <p class="min-max-temperature">
+                  <span data-min-temperature>[Temp.]</span> / <span data-max-temperature>[Temp.]</span>
+                </p>
+                <p class="temperature" data-temperature>[Temp.]</p>
+                <p class="feelslike-temperature">Feels like <span data-feelslike-temperature>[Temp.]</span></p>
               </div>
               <div class="selected-weather-icon-condition">
                 <img src="../assets/icons/weather/day/partly-cloudy.svg" alt="" class="selected-weather-icon" draggable="false" />
@@ -60,7 +62,7 @@
             </section>
           </section>
           <section class="desktop-details-section">
-            <h2 class="desktop-details-heading-location" data-location>Location</h2>
+            <h2 class="desktop-details-heading-location" data-location>[Location]</h2>
             <div class="desktop-details">
               <div class="desktop-detail">
                 <img src="../assets/icons/weather-details/humidity.svg" alt="" class="weather-desktop-detail-icon" />
@@ -257,54 +259,94 @@
           <ul class="forecast-list" data-day="0" data-hour="-1" data-forecast-list="-1">
             <li>
               <button class="forecast-item selected">
-                <p class="forecast-temperature">—°C</p>
+                <p class="forecast-temperature">[Temp.]</p>
                 <img src="../assets/icons/weather/day/partly-cloudy.svg" alt="" class="forecast-icon" draggable="false" />
-                <p class="forecast-day">Day</p>
+                <p class="forecast-day">[Day]</p>
               </button>
             </li>
             <li>
               <button class="forecast-item">
-                <p class="forecast-temperature">—°C</p>
+                <p class="forecast-temperature">[Temp.]</p>
                 <img src="../assets/icons/weather/day/partly-cloudy.svg" alt="" class="forecast-icon" draggable="false" />
-                <p class="forecast-day">Day</p>
+                <p class="forecast-day">[Day]</p>
               </button>
             </li>
             <li>
               <button class="forecast-item">
-                <p class="forecast-temperature">—°C</p>
+                <p class="forecast-temperature">[Temp.]</p>
                 <img src="../assets/icons/weather/day/partly-cloudy.svg" alt="" class="forecast-icon" draggable="false" />
-                <p class="forecast-day">Day</p>
+                <p class="forecast-day">[Day]</p>
               </button>
             </li>
             <li>
               <button class="forecast-item">
-                <p class="forecast-temperature">—°C</p>
+                <p class="forecast-temperature">[Temp.]</p>
                 <img src="../assets/icons/weather/day/partly-cloudy.svg" alt="" class="forecast-icon" draggable="false" />
-                <p class="forecast-day">Day</p>
+                <p class="forecast-day">[Day]</p>
               </button>
             </li>
             <li>
               <button class="forecast-item">
-                <p class="forecast-temperature">—°C</p>
+                <p class="forecast-temperature">[Temp.]</p>
                 <img src="../assets/icons/weather/day/partly-cloudy.svg" alt="" class="forecast-icon" draggable="false" />
-                <p class="forecast-day">Day</p>
+                <p class="forecast-day">[Day]</p>
               </button>
             </li>
             <li>
               <button class="forecast-item">
-                <p class="forecast-temperature">—°C</p>
+                <p class="forecast-temperature">[Temp.]</p>
                 <img src="../assets/icons/weather/day/partly-cloudy.svg" alt="" class="forecast-icon" draggable="false" />
-                <p class="forecast-day">Day</p>
+                <p class="forecast-day">[Day]</p>
               </button>
             </li>
             <li>
               <button class="forecast-item">
-                <p class="forecast-temperature">—°C</p>
+                <p class="forecast-temperature">[Temp.]</p>
                 <img src="../assets/icons/weather/day/partly-cloudy.svg" alt="" class="forecast-icon" draggable="false" />
-                <p class="forecast-day">Day</p>
+                <p class="forecast-day">[Day]</p>
               </button>
             </li>
           </ul>
+        </section>
+        <section
+          class="unit-conversion-panel-container"
+          data-selected-temperature-toggle="1"
+          data-selected-time-toggle="1"
+          data-selected-speed-toggle="1"
+          data-selected-direction-toggle="1"
+        >
+          <div class="unit-conversion-panel-overlay"></div>
+          <div class="unit-conversion-panel">
+            <div class="unit-conversion-container">
+              <h2 class="unit-conversion-heading">Temperature</h2>
+              <div class="unit-toggle-container" data-temperature-toggle data-unit-toggle="temperature">
+                <button class="unit-toggle unit-toggle-1 selected">°C</button>
+                <button class="unit-toggle unit-toggle-2">°F</button>
+              </div>
+            </div>
+            <div class="unit-conversion-container">
+              <h2 class="unit-conversion-heading">Time</h2>
+              <div class="unit-toggle-container" data-time-toggle data-unit-toggle="time">
+                <button class="unit-toggle unit-toggle-1 selected">12-hour</button>
+                <button class="unit-toggle unit-toggle-2">24-hour</button>
+              </div>
+            </div>
+            <div class="unit-conversion-container">
+              <h2 class="unit-conversion-heading">Speed</h2>
+              <div class="unit-toggle-container" data-speed-toggle data-unit-toggle="speed">
+                <button class="unit-toggle unit-toggle-1 selected">km/h</button>
+                <button class="unit-toggle unit-toggle-2">mph</button>
+              </div>
+            </div>
+            <div class="unit-conversion-container">
+              <h2 class="unit-conversion-heading">Direction</h2>
+              <div class="unit-toggle-container" data-direction-toggle data-unit-toggle="direction">
+                <button class="unit-toggle unit-toggle-1 selected">Text</button>
+                <button class="unit-toggle unit-toggle-2">Degrees</button>
+              </div>
+            </div>
+            <button class="unit-conversion-panel-done-button">Done</button>
+          </div>
         </section>
       </main>
     </div>

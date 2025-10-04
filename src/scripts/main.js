@@ -7,6 +7,10 @@ const searchButton = document.getElementsByClassName("search-button")[0];
 const clearSearchButton = document.getElementsByClassName("clear-search-button")[0];
 const searchInput = document.getElementById("search");
 const searchSuggestions = document.getElementById("search-suggestions");
+const unit_conversion_button = document.getElementsByClassName("unit-conversion-button")[0];
+const unit_conversion_panel_container = document.getElementsByClassName("unit-conversion-panel-container")[0];
+const unit_conversion_panel_done_button = document.getElementsByClassName("unit-conversion-panel-done-button")[0];
+const unit_toggle_containers = [...document.querySelectorAll("[data-unit-toggle]")];
 const selected_weather_icon = [...document.getElementsByClassName("selected-weather-icon")];
 const mobile_details_panel_container = document.getElementsByClassName("mobile-details-panel-container")[0];
 const mobile_details_button = document.getElementsByClassName("mobile-details-button")[0];
@@ -85,6 +89,67 @@ function updateScreenLabel() {
   }
 }
 
+function get_temperature_toggle(zero_index = false) {
+  const datasets = Object.entries(unit_conversion_panel_container.dataset);
+  const obj = {};
+  if (zero_index) {
+    datasets.map(dataset => {
+      const label = dataset[0].slice(8, -6).toLowerCase();
+      let index = parseInt(dataset[1]);
+      obj[label] = --index;
+    });
+  } else {
+    datasets.map(dataset => {
+      const label = dataset[0].slice(8, -6).toLowerCase();
+      const index = parseInt(dataset[1]);
+      obj[label] = index;
+    });
+  }
+  return obj;
+}
+
+const toggle_unit = {
+  temperature: index => {
+    unit_conversion_panel_container.dataset.selectedTemperatureToggle = index + 1;
+    const temperatures = [
+      ...document.querySelectorAll("[data-temperature]"),
+      document.querySelector("[data-min-temperature]"),
+      document.querySelector("[data-max-temperature]"),
+    ];
+    temperatures.map(temperature => {
+      const values = [parseFloat(temperature.dataset.toggleOne), parseFloat(temperature.dataset.toggleTwo)];
+      const units = ["°C", "°F"];
+      temperature.textContent = `${values[index]}${units[index]}`;
+    });
+  },
+  time: index => {
+    unit_conversion_panel_container.dataset.selectedTimeToggle = index + 1;
+    const times = [
+      ...document.querySelectorAll("[data-time]"),
+      ...document.querySelectorAll("[data-sunrise]"),
+      ...document.querySelectorAll("[data-sunset]"),
+    ];
+    times.map(time => {
+      const values = [time.dataset.toggleOne, time.dataset.toggleTwo];
+      time.textContent = values[index];
+    });
+  },
+  speed: index => {
+    unit_conversion_panel_container.dataset.selectedTemperatureToggle = index + 1;
+    const speed = document.querySelector("[data-wind-speed]");
+    const values = [parseFloat(speed.dataset.toggleOne), parseFloat(speed.dataset.toggleTwo)];
+    const units = ["km/h", "mph"];
+    speed.textContent = `${values[index]} ${units[index]}`;
+  },
+  direction: index => {
+    unit_conversion_panel_container.dataset.selectedTemperatureToggle = index + 1;
+    const direction = document.querySelector("[data-wind-direction]");
+    const values = [direction.dataset.toggleOne, parseFloat(direction.dataset.toggleTwo)];
+    const units = ["", "°"];
+    direction.textContent = `${values[index]}${units[index]}`;
+  },
+};
+
 // Initialization IIFE
 (() => {
   // Add keyboard support
@@ -107,6 +172,25 @@ function updateScreenLabel() {
     weather_data = local_weather_data;
     displayWeatherData(Weather.format(weather_data), forecastList, true);
   }
+
+  unit_conversion_button.addEventListener("click", () => {
+    unit_conversion_panel_container.classList.add("visible");
+  });
+  unit_conversion_panel_done_button.addEventListener("click", () => {
+    unit_conversion_panel_container.classList.remove("visible");
+  });
+  unit_toggle_containers.forEach(unit_toggle_container => {
+    const siblings = [...unit_toggle_container.children];
+    const toggle_label = unit_toggle_container.dataset.unitToggle;
+    siblings.forEach((toggle, index) => {
+      toggle.addEventListener("click", () => {
+        if (toggle.classList.contains("selected")) return;
+        siblings.map(sibling => sibling.classList.remove("selected"));
+        toggle.classList.add("selected");
+        toggle_unit[toggle_label](index);
+      });
+    });
+  });
 
   // Show suggestions after typing
   searchInput.addEventListener("input", () => {
@@ -172,7 +256,8 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
   const days = [...document.querySelectorAll("[data-day]:not(.forecast-list)")];
   const times = [...document.querySelectorAll("[data-time]")];
   const locations = [...document.querySelectorAll("[data-location]")];
-  const min_max_temperature = document.querySelector("[data-min-max-temperature]");
+  const min_temperature = document.querySelector("[data-min-temperature]");
+  const max_temperature = document.querySelector("[data-max-temperature]");
   const temperature = document.querySelector("[data-temperature]");
   const feelslike_temperature = document.querySelector("[data-feelslike-temperature]");
   const weather_condition = [...document.querySelectorAll("[data-weather-condition]")];
@@ -195,7 +280,6 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
     } else {
       forecast = data.current;
       forecast_units = data.current_units;
-      forecast_list_DOM_container.dataset.forecastList = -1;
     }
   } else if (selected_list === 0) {
     forecast = data.daily[day_index];
@@ -216,51 +300,93 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
     }
   }
 
-  const config = [
-    [days, format.weekday(forecast.date)],
-    [times, forecast.time ? format.time(forecast.time, true) : format.date(forecast.date)],
-    [locations, data.location],
-    [
-      min_max_temperature,
-      `${forecast.temperature_min}${forecast_units.temperature_min} / ${forecast.temperature_max}${forecast_units.temperature_max}`,
-    ],
-    [temperature, `${forecast.temperature}${forecast_units.temperature}`],
-    [feelslike_temperature, `Feels-like ${forecast.temperature_feelslike}${forecast_units.temperature_feelslike}`],
-    [weather_condition, forecast.condition],
-    [humidity, `${forecast.humidity}${forecast_units.humidity}`],
-    [precipitation, `${forecast.precipitation}${forecast_units.precipitation}`],
-    [pressure, `${forecast.pressure} ${forecast_units.pressure}`],
-    [uv_index, `${forecast.uv_index} ${forecast_units.uv_index}`],
-    [wind_speed, `${forecast.wind_speed} ${forecast_units.wind_speed}`],
-    [wind_direction, getDirectionText(forecast.wind_direction)],
-    [sunrise, format.time(forecast.sunrise, true)],
-    [sunset, format.time(forecast.sunset, true)],
+  Icon.get(forecast.weather_code).then(icon_URL => selected_weather_icon.map(icon => (icon.src = icon_URL.default)));
+  const elements = [
+    [...days],
+    [...locations],
+    [...weather_condition],
+    [...humidity],
+    [...precipitation],
+    [...pressure],
+    [...uv_index],
   ];
+  const element_texts = [
+    format.weekday(forecast.date),
+    data.location,
+    forecast.condition,
+    `${forecast.humidity}%`,
+    `${forecast.precipitation}%`,
+    `${forecast.pressure} hPa`,
+    forecast.uv_index,
+  ];
+  set_text_content(elements, element_texts);
+  const selected_toggle = get_temperature_toggle(true);
+  const temperatures = [temperature, min_temperature, max_temperature, feelslike_temperature];
+  const temperature_values = [
+    [forecast.temperature, parseFloat((forecast.temperature * 9) / 5 + 32).toFixed(1)],
+    [forecast.temperature_min, parseFloat((forecast.temperature_min * 9) / 5 + 32).toFixed(1)],
+    [forecast.temperature_max, parseFloat((forecast.temperature_max * 9) / 5 + 32).toFixed(1)],
+    [forecast.temperature_feelslike, parseFloat((forecast.temperature_feelslike * 9) / 5 + 32).toFixed(1)],
+  ];
+  set_temperature_data(temperatures, temperature_values, selected_toggle.temperature);
+  const time_elements = [[...times], [...sunrise], [...sunset]];
+  const time_element_values = [
+    [forecast.time ? format.time(forecast.time, true) : "", forecast.time ? format.time(forecast.time) : ""],
+    [format.time(forecast.sunrise, true), format.time(forecast.sunrise)],
+    [format.time(forecast.sunset, true), format.time(forecast.sunset)],
+  ];
+  set_time_data(time_elements, time_element_values, selected_toggle.time);
+  set_speed_data(
+    [...wind_speed],
+    [forecast.wind_speed, parseFloat(forecast.wind_speed / 1.609).toFixed(1)],
+    selected_toggle.speed
+  );
+  set_direction_data(
+    [...wind_direction],
+    [getDirectionText(forecast.wind_direction), forecast.wind_direction],
+    selected_toggle.direction
+  );
 
-  setTextContent(config);
-  Icon.get(forecast.weather_code).then(icon_URL => {
-    selected_weather_icon.forEach(icon => (icon.src = icon_URL.default));
-  });
-  if (display_forecast_list) {
-    if (selected_list !== -1 && selected_list !== 0) {
-      displayWeatherForecasts(data, forecast_list_DOM_container, false);
-    } else {
-      displayWeatherForecasts(data, forecast_list_DOM_container);
-    }
-  }
-
-  function setTextContent(configs) {
-    configs.forEach(config => {
-      const [elements, value] = config;
-      if (Array.isArray(elements)) {
-        elements.forEach(element => {
-          element.textContent = value;
-        });
-      } else {
-        elements.textContent = value;
-      }
+  function set_text_content(array_of_elements, array_of_text) {
+    array_of_elements.forEach((element, index) => {
+      element.map(element => (element.textContent = array_of_text[index]));
     });
   }
+  function set_temperature_data(elements, array_of_values, value_index) {
+    elements.forEach((element, index) => {
+      const value = array_of_values[index];
+      element.textContent = `${value[value_index]}${["°C", "°F"][value_index]}`;
+      element.dataset.toggleOne = value[0];
+      element.dataset.toggleTwo = value[1];
+    });
+  }
+  function set_time_data(array_of_elements, array_of_values, value_index) {
+    array_of_elements.forEach((elements, index) => {
+      elements.forEach(element => {
+        const value = array_of_values[index];
+        element.textContent = value[value_index];
+        element.dataset.toggleOne = value[0];
+        element.dataset.toggleTwo = value[1];
+      });
+    });
+  }
+  function set_speed_data(elements, array_of_values, value_index) {
+    elements.forEach(element => {
+      const value = array_of_values;
+      element.textContent = `${value[value_index]} ${["km/h", "mph"][value_index]}`;
+      element.dataset.toggleOne = value[0];
+      element.dataset.toggleTwo = value[1];
+    });
+  }
+  function set_direction_data(elements, array_of_values, value_index) {
+    elements.forEach(element => {
+      const value = array_of_values;
+      element.textContent = `${value[value_index]} ${["", "°"][value_index]}`;
+      element.dataset.toggleOne = value[0];
+      element.dataset.toggleTwo = value[1];
+    });
+  }
+  if (display_forecast_list) displayWeatherForecasts(data, forecast_list_DOM_container);
 }
 
 // This function displays daily or hourly forecast list
@@ -331,6 +457,9 @@ function displayWeatherForecasts(data, forecast_list_DOM_container, isDaily = tr
 }
 
 function createDOMForecast(forecast, forecast_index, forecast_list_DOM_container, isDaily = true) {
+  const selected_toggle = get_temperature_toggle();
+  const times = [...document.getElementsByClassName("time")];
+  const dates = [...document.getElementsByClassName("date")];
   const li = document.createElement("li");
   const button = document.createElement("button");
   button.classList.add("forecast-item");
@@ -347,6 +476,8 @@ function createDOMForecast(forecast, forecast_index, forecast_list_DOM_container
       const selected_day = document.querySelector(`.forecast-item[data-index="${forecast_index}"]`);
       if (selected_day) selected_day.classList.add("selected");
       handleForecastDisplay(forecast_index, isDaily);
+      times.map(time => (time.style.display = "none"));
+      dates.map(date => (date.style.display = ""));
     });
   } else {
     button.dataset.hourly = "";
@@ -359,11 +490,19 @@ function createDOMForecast(forecast, forecast_index, forecast_list_DOM_container
       const selected_hour = document.querySelector(`.forecast-item[data-index="${forecast_index}"]`);
       if (selected_hour) selected_hour.classList.add("selected");
       handleForecastDisplay(forecast_index, isDaily);
+      dates.map(date => (date.style.display = "none"));
+      times.map(time => (time.style.display = ""));
     });
   }
   const temperature = document.createElement("p");
+  const celcius = forecast.temperature;
+  const fahrenheit = parseFloat((forecast.temperature * 9) / 5 + 32).toFixed(1);
   temperature.classList.add("forecast-temperature");
-  temperature.textContent = `${forecast.temperature}°C`;
+  if (selected_toggle.temperature === 1) temperature.textContent = `${celcius}°C`;
+  else temperature.textContent = `${fahrenheit}°F`;
+  temperature.dataset.temperature = "";
+  temperature.dataset.toggleOne = celcius;
+  temperature.dataset.toggleTwo = fahrenheit;
   const icon = document.createElement("img");
   icon.src = "#";
   Icon.get(forecast.weather_code)
@@ -386,7 +525,13 @@ function createDOMForecast(forecast, forecast_index, forecast_list_DOM_container
   } else {
     const time = document.createElement("p");
     time.classList.add("forecast-time");
-    time.textContent = format.time(forecast.time, true);
+    const twelve_hour = format.time(forecast.time, true);
+    const twenty_four_hour = format.time(forecast.time);
+    if (selected_toggle.time === 1) time.textContent = twelve_hour;
+    else time.textContent = twenty_four_hour;
+    time.dataset.time = "";
+    time.dataset.toggleOne = twelve_hour;
+    time.dataset.toggleTwo = twenty_four_hour;
     button.appendChild(time);
   }
   li.appendChild(button);
