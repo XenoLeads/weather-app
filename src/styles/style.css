@@ -338,11 +338,17 @@ main {
   gap: 0.4rem;
   white-space: nowrap;
 }
+.mobile-details > .detail:nth-of-type(4),
 .mobile-details > .detail:nth-of-type(6) {
   padding-left: 0.2rem;
 }
+.weather-detail-icon {
+  width: 2rem;
+  aspect-ratio: 1/1;
+  object-fit: contain;
+}
 .mobile-details > .detail > .weather-detail-icon {
-  height: 1rem;
+  width: 1.2rem;
 }
 .mobile-details > .detail > .label-value > .label {
   font-size: 0.9rem;
@@ -350,12 +356,12 @@ main {
 .mobile-details > .detail > .label-value > .value {
   font-size: 0.8rem;
 }
-.mobile-details > .detail:first-of-type > .weather-detail-icon,
-.mobile-details > .detail:nth-of-type(3) > .weather-detail-icon,
-.mobile-details > .detail:nth-of-type(4) > .weather-detail-icon,
+.mobile-details > .detail:nth-of-type(5) > .weather-detail-icon,
+.mobile-details > .detail:nth-of-type(7) > .weather-detail-icon,
 .mobile-details > .detail:nth-of-type(8) > .weather-detail-icon {
-  height: 1.4rem;
+  width: 1.6rem;
 }
+
 .mobile-details-dismiss-button {
   background: none;
   outline: none;
@@ -603,17 +609,6 @@ main {
   gap: 1rem;
   white-space: nowrap;
 }
-.detail:first-of-type > .weather-detail-icon,
-.detail:nth-of-type(3) > .weather-detail-icon,
-.detail:nth-of-type(4) > .weather-detail-icon,
-.detail:nth-of-type(8) > .weather-detail-icon {
-  height: 2.5rem;
-}
-.weather-detail-icon {
-  height: 2rem;
-  aspect-ratio: 1/1;
-  object-fit: contain;
-}
 .details > .detail > .label-value {
   display: flex;
   flex-direction: column;
@@ -720,6 +715,12 @@ main {
   .unit-conversion-panel-done-button {
     font-size: 1rem;
   }
+  .detail:first-of-type > .weather-detail-icon,
+  .detail:nth-of-type(3) > .weather-detail-icon,
+  .detail:nth-of-type(4) > .weather-detail-icon,
+  .detail:nth-of-type(8) > .weather-detail-icon {
+    width: 2.5rem;
+  }
 }
 
 /* Desktop */
@@ -765,9 +766,8 @@ main {
   object-fit: contain;
 }
 .desktop-detail:nth-of-type(2) > .weather-desktop-detail-icon,
-.desktop-detail:nth-of-type(5) > .weather-desktop-detail-icon,
-.desktop-detail:nth-of-type(6) > .weather-desktop-detail-icon,
-.desktop-detail:nth-of-type(7) > .weather-desktop-detail-icon {
+.desktop-detail:nth-of-type(3) > .weather-desktop-detail-icon,
+.desktop-detail:nth-of-type(6) > .weather-desktop-detail-icon {
   padding: 0.2rem;
 }
 @media screen and (min-width: 769px) {
