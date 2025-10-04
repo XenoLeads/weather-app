@@ -82,11 +82,18 @@ async function getWeatherData(locationName) {
 }
 
 function formatWeatherData(data) {
-  const formattedData = { location: data.location, current: {}, current_units: {}, daily: [], daily_units: {}, hourly_units: {} };
-  for (let i = 0; i < data.daily.weather_code.length; i++) formattedData.daily.push({ hourly: [] });
+  const formattedData = {
+    location: data.location,
+    current: { type: "current" },
+    current_units: {},
+    daily: [],
+    daily_units: {},
+    hourly_units: {},
+  };
+  for (let i = 0; i < data.daily.weather_code.length; i++) formattedData.daily.push({ type: "daily", hourly: [] });
   for (let i = 0; i < formattedData.daily.length; i++) {
     for (let j = 0; j < 24; j++) {
-      formattedData.daily[i].hourly.push({});
+      formattedData.daily[i].hourly.push({ type: "hourly" });
     }
   }
 
