@@ -304,7 +304,15 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
     }
   }
 
-  Icon.get(forecast.weather_code).then(icon_URL => selected_weather_icon.map(icon => (icon.src = icon_URL.default)));
+  if (forecast.time) {
+    const forecast_date = new Date(forecast.time);
+    const forecast_hours = forecast_date.getHours();
+    const isNight = forecast_hours >= 20 || forecast_hours <= 5;
+    if (isNight)
+      Icon.get(forecast.weather_code, false).then(icon_URL => selected_weather_icon.map(icon => (icon.src = icon_URL.default)));
+    else Icon.get(forecast.weather_code).then(icon_URL => selected_weather_icon.map(icon => (icon.src = icon_URL.default)));
+  } else Icon.get(forecast.weather_code).then(icon_URL => selected_weather_icon.map(icon => (icon.src = icon_URL.default)));
+
   const elements = [
     [...days],
     [...locations],
@@ -509,13 +517,15 @@ function createDOMForecast(forecast, forecast_index, forecast_list_DOM_container
   temperature.dataset.toggleTwo = fahrenheit;
   const icon = document.createElement("img");
   icon.src = "#";
-  Icon.get(forecast.weather_code)
-    .then(icon_URL => {
-      icon.src = icon_URL.default;
-    })
-    .catch(error => {
-      console.error(error);
-    });
+
+  if (forecast.time) {
+    const forecast_date = new Date(forecast.time);
+    const forecast_hours = forecast_date.getHours();
+    const isNight = forecast_hours >= 20 || forecast_hours <= 5;
+    if (isNight) Icon.get(forecast.weather_code, false).then(icon_URL => (icon.src = icon_URL.default));
+    else Icon.get(forecast.weather_code).then(icon_URL => (icon.src = icon_URL.default));
+  } else Icon.get(forecast.weather_code).then(icon_URL => (icon.src = icon_URL.default));
+
   icon.alt = "";
   icon.classList.add("forecast-icon");
   icon.draggable = false;
