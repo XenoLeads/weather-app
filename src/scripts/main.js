@@ -136,17 +136,21 @@ const toggle_unit = {
   },
   speed: index => {
     unit_conversion_panel_container.dataset.selectedTemperatureToggle = index + 1;
-    const speed = document.querySelector("[data-wind-speed]");
-    const values = [parseFloat(speed.dataset.toggleOne), parseFloat(speed.dataset.toggleTwo)];
+    const speeds = [...document.querySelectorAll("[data-wind-speed]")];
     const units = ["km/h", "mph"];
-    speed.textContent = `${values[index]} ${units[index]}`;
+    speeds.map(speed => {
+      const values = [parseFloat(speed.dataset.toggleOne), parseFloat(speed.dataset.toggleTwo)];
+      speed.textContent = `${values[index]} ${units[index]}`;
+    });
   },
   direction: index => {
     unit_conversion_panel_container.dataset.selectedTemperatureToggle = index + 1;
-    const direction = document.querySelector("[data-wind-direction]");
-    const values = [direction.dataset.toggleOne, parseFloat(direction.dataset.toggleTwo)];
+    const directions = [...document.querySelectorAll("[data-wind-direction]")];
     const units = ["", "°"];
-    direction.textContent = `${values[index]}${units[index]}`;
+    directions.map(direction => {
+      const values = [direction.dataset.toggleOne, parseFloat(direction.dataset.toggleTwo)];
+      direction.textContent = `${values[index]}${units[index]}`;
+    });
   },
 };
 
