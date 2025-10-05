@@ -523,17 +523,17 @@ function displayWeatherForecasts(data, forecast_list_DOM_container, isDaily = tr
     // Select current selected forecast
     const hour = parseInt(forecastList.dataset.hour);
     let selected_hour;
-    if (hour === -1) selected_hour = document.querySelector(`.forecast-item[data-index="-1"]`);
-    else {
-      const hour_index = parseInt(new Date().toLocaleTimeString().split(":")[0]);
-      selected_hour = document.querySelector(`.forecast-item[data-index="${hour_index}"]`);
+    if (hour !== -2) {
+      if (hour === -1) selected_hour = document.querySelector(`.forecast-item[data-index="-1"]`);
+      else {
+        selected_hour = document.querySelector(`.forecast-item[data-index="${hour}"]`);
+      }
+      if (!selected_hour) {
+        const date = new Date();
+        selected_hour = document.querySelector(`.forecast-item[data-index="${date.getHours()}"]`);
+      }
+      if (selected_hour) selected_hour.classList.add("selected");
     }
-    if (!selected_hour) {
-      const hour_index = parseInt(new Date().toLocaleTimeString().split(":")[0]);
-      selected_hour = document.querySelector(`.forecast-item[data-index="${hour_index}"]`);
-    }
-    const DOM_hour_index = parseInt(forecast_list_DOM_container.dataset.hour);
-    if (DOM_hour_index !== -2) selected_hour.classList.add("selected");
   }
 }
 
