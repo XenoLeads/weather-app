@@ -34,16 +34,18 @@
         </button>
       </header>
       <main>
-        <section class="selected-weather-forecast">
+        <section class="selected-weather-forecast" data-visible-time>
           <h2 class="location-name" data-location>[Location]</h2>
           <div class="location-day-time">
             <h2 class="location" data-location>[Location]</h2>
             <h2 class="day" data-day>[Day]</h2>
+            <h2 class="date" data-date>[Date]</h2>
             <h2 class="time" data-time>[Time]</h2>
           </div>
-          <section class="temperatures-icon-day-time">
+          <section class="temperatures-icon-day-time" data-visible-time>
             <div class="day-time">
               <p class="day" data-day>[Day]</p>
+              <p class="date" data-date>[Date]</p>
               <p class="time" data-time>[Time]</p>
             </div>
             <section class="temperature-icon">
@@ -256,7 +258,7 @@
             <button id="daily-button" class="forecast-toggle-button selected">Daily</button>
             <button id="hourly-button" class="forecast-toggle-button">Hourly</button>
           </nav>
-          <ul class="forecast-list" data-day="0" data-hour="-1" data-forecast-list="-1">
+          <ul class="forecast-list" data-day="0" data-hour="-1" data-forecast-list="-1" data-selected-forecast-type="current">
             <li>
               <button class="forecast-item selected">
                 <p class="forecast-temperature">[Temp.]</p>

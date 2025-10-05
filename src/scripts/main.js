@@ -258,6 +258,7 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
   const day_index = parseInt(forecast_list_DOM_container.dataset.day);
   const hour_index = parseInt(forecast_list_DOM_container.dataset.hour);
   const days = [...document.querySelectorAll("[data-day]:not(.forecast-list)")];
+  const dates = [...document.querySelectorAll("[data-date]")];
   const times = [...document.querySelectorAll("[data-time]:not(.forecast-time)")];
   const locations = [...document.querySelectorAll("[data-location]")];
   const min_temperature = document.querySelector("[data-min-temperature]");
@@ -315,6 +316,7 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
 
   const elements = [
     [...days],
+    [...dates],
     [...locations],
     [...weather_condition],
     [...humidity],
@@ -324,6 +326,7 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
   ];
   const element_texts = [
     format.weekday(forecast.date),
+    format.date(forecast.date),
     data.location,
     forecast.condition,
     `${forecast.humidity}%`,
@@ -341,13 +344,16 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
     [forecast.temperature_feelslike, parseFloat((forecast.temperature_feelslike * 9) / 5 + 32).toFixed(1)],
   ];
   set_temperature_data(temperatures, temperature_values, selected_toggle.temperature);
-  const time_elements = [[...times], [...sunrise], [...sunset]];
+  const time_elements = [[...sunrise], [...sunset]];
   const time_element_values = [
-    [forecast.time ? format.time(forecast.time, true) : "", forecast.time ? format.time(forecast.time) : ""],
     [format.time(forecast.sunrise, true), format.time(forecast.sunrise)],
     [format.time(forecast.sunset, true), format.time(forecast.sunset)],
   ];
   set_time_data(time_elements, time_element_values, selected_toggle.time);
+  if (forecast.time) {
+    console.log(forecast.time, format.time(forecast.time, true));
+    set_time_data([[...times]], [[format.time(forecast.time, true), format.time(forecast.time)]], selected_toggle.time);
+  }
   set_speed_data(
     [...wind_speed],
     [forecast.wind_speed, parseFloat(forecast.wind_speed / 1.609).toFixed(1)],
@@ -470,8 +476,6 @@ function displayWeatherForecasts(data, forecast_list_DOM_container, isDaily = tr
 
 function createDOMForecast(forecast, forecast_index, forecast_list_DOM_container, isDaily = true) {
   const selected_toggle = get_temperature_toggle();
-  const times = [...document.getElementsByClassName("time")];
-  const dates = [...document.getElementsByClassName("date")];
   const li = document.createElement("li");
   const button = document.createElement("button");
   button.classList.add("forecast-item");
@@ -479,7 +483,8 @@ function createDOMForecast(forecast, forecast_index, forecast_list_DOM_container
   if (isDaily) {
     button.dataset.daily = "";
     button.addEventListener("click", () => {
-      if (button.classList.contains("selected")) return;
+      if (forecast_list_DOM_container.dataset.selectedForecastType === "daily" && button.classList.contains("selected")) return;
+      forecast_list_DOM_container.dataset.selectedForecastType = "daily";
       forecast_list_DOM_container.dataset.forecastList = 0;
       forecast_list_DOM_container.dataset.day = forecast_index;
       forecast_list_DOM_container.dataset.hour = -2;
@@ -489,13 +494,15 @@ function createDOMForecast(forecast, forecast_index, forecast_list_DOM_container
       const selected_day = document.querySelector(`.forecast-item[data-index="${forecast_index}"]`);
       if (selected_day) selected_day.classList.add("selected");
       displayWeatherData(Weather.format(weather_data), forecast_list_DOM_container);
-      times.map(time => (time.style.display = "none"));
-      dates.map(date => (date.style.display = ""));
+      [...document.querySelectorAll("[data-visible-time]")].map(time_container =>
+        time_container.classList.remove("visible-time")
+      );
     });
   } else {
     button.dataset.hourly = "";
     button.addEventListener("click", () => {
-      if (button.classList.contains("selected")) return;
+      if (forecast_list_DOM_container.dataset.selectedForecastType === "hourly" && button.classList.contains("selected")) return;
+      forecast_list_DOM_container.dataset.selectedForecastType = "hourly";
       forecast_list_DOM_container.dataset.forecastList = 1;
       forecast_list_DOM_container.dataset.hour = forecast_index;
       [...forecast_list_DOM_container.getElementsByClassName("forecast-item")].forEach(forecast_item =>
@@ -504,8 +511,7 @@ function createDOMForecast(forecast, forecast_index, forecast_list_DOM_container
       const selected_hour = document.querySelector(`.forecast-item[data-index="${forecast_index}"]`);
       if (selected_hour) selected_hour.classList.add("selected");
       displayWeatherData(Weather.format(weather_data), forecast_list_DOM_container);
-      dates.map(date => (date.style.display = "none"));
-      times.map(time => (time.style.display = ""));
+      [...document.querySelectorAll("[data-visible-time]")].map(time_container => time_container.classList.add("visible-time"));
     });
   }
   const temperature = document.createElement("p");
