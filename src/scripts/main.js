@@ -309,7 +309,7 @@ function capitalize(string) {
           search_input.value = "";
           displayWeatherData(Weather.format(response), forecast_list, true);
           search_input.blur();
-          manage_panels("loading", false, false);
+          setTimeout(() => manage_panels("loading", false, false), 500);
         })
         .catch(error => {
           console.error(error);
