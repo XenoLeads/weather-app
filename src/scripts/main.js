@@ -258,7 +258,7 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
   const day_index = parseInt(forecast_list_DOM_container.dataset.day);
   const hour_index = parseInt(forecast_list_DOM_container.dataset.hour);
   const days = [...document.querySelectorAll("[data-day]:not(.forecast-list)")];
-  const times = [...document.querySelectorAll("[data-time]")];
+  const times = [...document.querySelectorAll("[data-time]:not(.forecast-time)")];
   const locations = [...document.querySelectorAll("[data-location]")];
   const min_temperature = document.querySelector("[data-min-temperature]");
   const max_temperature = document.querySelector("[data-max-temperature]");
@@ -479,6 +479,7 @@ function createDOMForecast(forecast, forecast_index, forecast_list_DOM_container
   if (isDaily) {
     button.dataset.daily = "";
     button.addEventListener("click", () => {
+      if (button.classList.contains("selected")) return;
       forecast_list_DOM_container.dataset.forecastList = 0;
       forecast_list_DOM_container.dataset.day = forecast_index;
       forecast_list_DOM_container.dataset.hour = -2;
@@ -487,13 +488,14 @@ function createDOMForecast(forecast, forecast_index, forecast_list_DOM_container
       );
       const selected_day = document.querySelector(`.forecast-item[data-index="${forecast_index}"]`);
       if (selected_day) selected_day.classList.add("selected");
-      handleForecastDisplay(forecast_index, isDaily);
+      displayWeatherData(Weather.format(weather_data), forecast_list_DOM_container);
       times.map(time => (time.style.display = "none"));
       dates.map(date => (date.style.display = ""));
     });
   } else {
     button.dataset.hourly = "";
     button.addEventListener("click", () => {
+      if (button.classList.contains("selected")) return;
       forecast_list_DOM_container.dataset.forecastList = 1;
       forecast_list_DOM_container.dataset.hour = forecast_index;
       [...forecast_list_DOM_container.getElementsByClassName("forecast-item")].forEach(forecast_item =>
@@ -501,7 +503,7 @@ function createDOMForecast(forecast, forecast_index, forecast_list_DOM_container
       );
       const selected_hour = document.querySelector(`.forecast-item[data-index="${forecast_index}"]`);
       if (selected_hour) selected_hour.classList.add("selected");
-      handleForecastDisplay(forecast_index, isDaily);
+      displayWeatherData(Weather.format(weather_data), forecast_list_DOM_container);
       dates.map(date => (date.style.display = "none"));
       times.map(time => (time.style.display = ""));
     });
@@ -566,14 +568,4 @@ function isCurrentForecastUnique(forecast_list, current_forecast) {
   });
   if (closest_time_index === -1) return false;
   return closest_time_index;
-}
-
-function handleForecastDisplay(forecast_index, isDaily) {
-  if (isDaily) {
-    forecastList.dataset.day = forecast_index;
-    displayWeatherData(Weather.format(weather_data), forecastList);
-  } else {
-    forecastList.dataset.hour = forecast_index;
-    displayWeatherData(Weather.format(weather_data), forecastList);
-  }
 }
