@@ -362,6 +362,7 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
   ];
   set_time_data(time_elements, time_element_values, selected_toggle.time);
   if (forecast.time) {
+    [...document.querySelectorAll("[data-visible-time]")].map(time_container => time_container.classList.add("visible-time"));
     set_time_data([[...times]], [[format.time(forecast.time, true), format.time(forecast.time)]], selected_toggle.time);
   }
   set_speed_data(
