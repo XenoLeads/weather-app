@@ -308,6 +308,8 @@ function capitalize(string) {
           weather_data = response;
           search_input.value = "";
           displayWeatherData(Weather.format(response), forecast_list, true);
+          hourly_button.classList.remove("selected");
+          daily_button.classList.add("selected");
           search_input.blur();
           setTimeout(() => manage_panels("loading", false, false), 500);
         })
