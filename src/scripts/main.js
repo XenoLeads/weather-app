@@ -142,7 +142,7 @@ const toggle_unit = {
     });
   },
   speed: index => {
-    unit_conversion_panel_container.dataset.selectedTemperatureToggle = index + 1;
+    unit_conversion_panel_container.dataset.selectedSpeedToggle = index + 1;
     const speeds = [...document.querySelectorAll("[data-wind-speed]")];
     const units = ["km/h", "mph"];
     speeds.map(speed => {
@@ -151,7 +151,7 @@ const toggle_unit = {
     });
   },
   direction: index => {
-    unit_conversion_panel_container.dataset.selectedTemperatureToggle = index + 1;
+    unit_conversion_panel_container.dataset.selectedDirectionToggle = index + 1;
     const directions = [...document.querySelectorAll("[data-wind-direction]")];
     const units = ["", "°"];
     directions.map(direction => {
