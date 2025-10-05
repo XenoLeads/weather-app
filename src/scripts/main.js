@@ -3,10 +3,10 @@ import Weather from "./weather-api.js";
 import Icon from "./weather-icons.js";
 
 const container = document.getElementById("container");
-const searchButton = document.getElementsByClassName("search-button")[0];
-const clearSearchButton = document.getElementsByClassName("clear-search-button")[0];
-const searchInput = document.getElementById("search");
-const searchSuggestions = document.getElementById("search-suggestions");
+const search_button = document.getElementsByClassName("search-button")[0];
+const clear_search_button = document.getElementsByClassName("clear-search-button")[0];
+const search_input = document.getElementById("search");
+const search_suggestions = document.getElementById("search-suggestions");
 const unit_conversion_button = document.getElementsByClassName("unit-conversion-button")[0];
 const unit_conversion_panel_container = document.getElementsByClassName("unit-conversion-panel-container")[0];
 const unit_conversion_panel_done_button = document.getElementsByClassName("unit-conversion-panel-done-button")[0];
@@ -17,7 +17,7 @@ const mobile_details_button = document.getElementsByClassName("mobile-details-bu
 const mobile_details_dismiss_button = document.getElementsByClassName("mobile-details-dismiss-button")[0];
 const daily_button = document.getElementById("daily-button");
 const hourly_button = document.getElementById("hourly-button");
-const forecastList = document.getElementsByClassName("forecast-list")[0];
+const forecast_list = document.getElementsByClassName("forecast-list")[0];
 const loading_panel_container = document.getElementsByClassName("loading-panel-container")[0];
 const notification_panel_container = document.getElementsByClassName("notification-panel-container")[0];
 const notification_dismiss_button = document.getElementsByClassName("notification-dismiss-button")[0];
@@ -26,53 +26,53 @@ const background_overlay = document.getElementsByClassName("background-overlay")
 const DIRECTIONS = ["North", "North-East", "East", "South-East", "South", "South-West", "West", "North-West"];
 const DEBOUNCE_DELAY = 250;
 const BLINKING_TIME = 250;
-let timeoutId;
+let timeout_id;
 let weather_data;
 
 // Data formatting module
 const format = {
   weekday: date => {
-    const dateObj = typeof date === "string" ? new Date(date) : date;
-    return new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(dateObj);
+    const date_obj = typeof date === "string" ? new Date(date) : date;
+    return new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(date_obj);
   },
-  time: (date, hour12 = false, includeSeconds = false) => {
-    const dateObj = typeof date === "string" ? new Date(date) : date;
+  time: (date, hour12 = false, include_seconds = false) => {
+    const date_obj = typeof date === "string" ? new Date(date) : date;
     const options = {
       hour: "numeric",
       minute: "2-digit",
       hour12: hour12,
     };
 
-    if (includeSeconds) {
+    if (include_seconds) {
       options.second = "2-digit";
     }
 
-    return new Intl.DateTimeFormat("en-US", options).format(dateObj);
+    return new Intl.DateTimeFormat("en-US", options).format(date_obj);
   },
   date: date => {
-    const dateObj = typeof date === "string" ? new Date(date) : date;
-    return dateObj.toISOString().split("T")[0];
+    const date_obj = typeof date === "string" ? new Date(date) : date;
+    return date_obj.toISOString().split("T")[0];
   },
   custom: (date, options = {}, locale = "en-US") => {
-    const dateObj = typeof date === "string" ? new Date(date) : date;
-    return new Intl.DateTimeFormat(locale, options).format(dateObj);
+    const date_obj = typeof date === "string" ? new Date(date) : date;
+    return new Intl.DateTimeFormat(locale, options).format(date_obj);
   },
 };
 
-function showSuggestions(location_name) {
+function show_suggestions(location_name) {
   Weather.geocode(location_name).then(geocode => {
     if (!geocode) return;
-    searchSuggestions.innerHTML = "";
+    search_suggestions.innerHTML = "";
     geocode.forEach(location => {
       const option = document.createElement("option");
       option.value = location.name;
       option.textContent = location.name;
-      searchSuggestions.appendChild(option);
+      search_suggestions.appendChild(option);
     });
   });
 }
 
-function updateScreenLabel() {
+function update_screen_label() {
   if (window.innerWidth >= 481 && window.innerWidth <= 768) {
     if (container.classList.contains("tablet")) return;
     container.classList.add("tablet");
@@ -238,10 +238,10 @@ function manage_panels(panel = null, show = true, show_overlay = true) {
   window.addEventListener("keydown", e => {
     if (!e.key) return;
     const pressed_key = e.key.toLowerCase();
-    if (pressed_key === "enter") searchButton.click();
+    if (pressed_key === "enter") search_button.click();
   });
-  window.addEventListener("resize", updateScreenLabel);
-  updateScreenLabel();
+  window.addEventListener("resize", update_screen_label);
+  update_screen_label();
 
   // Fix elements' animation on initial load
   window.onload = () => {
@@ -252,7 +252,7 @@ function manage_panels(panel = null, show = true, show_overlay = true) {
   const local_weather_data = JSON.parse(localStorage.getItem("weather_data"));
   if (local_weather_data) {
     weather_data = local_weather_data;
-    displayWeatherData(Weather.format(weather_data), forecastList, true);
+    displayWeatherData(Weather.format(weather_data), forecast_list, true);
   }
 
   unit_conversion_button.addEventListener("click", () => {
@@ -280,18 +280,18 @@ function manage_panels(panel = null, show = true, show_overlay = true) {
   });
 
   // Show suggestions after typing
-  searchInput.addEventListener("input", () => {
-    const value = searchInput.value.trim();
+  search_input.addEventListener("input", () => {
+    const value = search_input.value.trim();
     if (value.length < 3) return;
     // Debounce the API call to avoid making a request for every keystroke
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => {
-      showSuggestions(value);
+    clearTimeout(timeout_id);
+    timeout_id = setTimeout(() => {
+      show_suggestions(value);
     }, DEBOUNCE_DELAY);
   });
 
-  searchButton.addEventListener("click", () => {
-    const value = searchInput.value.trim();
+  search_button.addEventListener("click", () => {
+    const value = search_input.value.trim();
     if (value && value.length > 0) {
       manage_panels("loading");
       Weather.get(value)
@@ -299,9 +299,9 @@ function manage_panels(panel = null, show = true, show_overlay = true) {
           // Cache succesfully fetched weather data
           localStorage.setItem("weather_data", JSON.stringify(response));
           weather_data = response;
-          searchInput.value = "";
-          displayWeatherData(Weather.format(response), forecastList, true);
-          searchInput.blur();
+          search_input.value = "";
+          displayWeatherData(Weather.format(response), forecast_list, true);
+          search_input.blur();
           manage_panels("loading", false, false);
         })
         .catch(error => {
@@ -313,7 +313,7 @@ function manage_panels(panel = null, show = true, show_overlay = true) {
         });
     }
   });
-  clearSearchButton.addEventListener("click", () => (searchInput.value = ""));
+  clear_search_button.addEventListener("click", () => (search_input.value = ""));
 
   mobile_details_button.addEventListener("click", () => {
     manage_panels("mobile_details", true, false);
@@ -324,27 +324,27 @@ function manage_panels(panel = null, show = true, show_overlay = true) {
 
   daily_button.addEventListener("click", () => {
     if (daily_button.classList.contains("selected")) return;
-    [...forecastList.children].map(child => child.classList.add("blinking"));
+    [...forecast_list.children].map(child => child.classList.add("blinking"));
     setTimeout(() => {
       hourly_button.classList.remove("selected");
       daily_button.classList.add("selected");
-      forecastList.dataset.forecastList = 0;
-      displayWeatherForecasts(Weather.format(weather_data), forecastList);
-      const day_index = parseInt(forecastList.dataset.day);
+      forecast_list.dataset.forecastList = 0;
+      display_weather_forecasts(Weather.format(weather_data), forecast_list);
+      const day_index = parseInt(forecast_list.dataset.day);
       const selected_day = document.querySelector(`.forecast-item[data-index="${day_index}"]`);
       if (selected_day) selected_day.scrollIntoView({ behavior: "smooth", inline: "center" });
-      [...forecastList.children].map(child => child.classList.remove("blinking"));
+      [...forecast_list.children].map(child => child.classList.remove("blinking"));
     }, BLINKING_TIME);
   });
   hourly_button.addEventListener("click", () => {
     if (hourly_button.classList.contains("selected")) return;
-    [...forecastList.children].map(child => child.classList.add("blinking"));
+    [...forecast_list.children].map(child => child.classList.add("blinking"));
     setTimeout(() => {
       daily_button.classList.remove("selected");
       hourly_button.classList.add("selected");
-      forecastList.dataset.forecastList = 1;
-      displayWeatherForecasts(Weather.format(weather_data), forecastList, false);
-      const hour_index = parseInt(forecastList.dataset.hour);
+      forecast_list.dataset.forecastList = 1;
+      display_weather_forecasts(Weather.format(weather_data), forecast_list, false);
+      const hour_index = parseInt(forecast_list.dataset.hour);
       const selected_hour = document.querySelector(`.forecast-item[data-index="${hour_index}"]`);
       if (selected_hour) selected_hour.scrollIntoView({ behavior: "smooth", inline: "center" });
       else {
@@ -352,12 +352,12 @@ function manage_panels(panel = null, show = true, show_overlay = true) {
         const current_hour = document.querySelector(`.forecast-item[data-index="${date.getHours()}"]`);
         current_hour.scrollIntoView({ behavior: "smooth", inline: "center" });
       }
-      [...forecastList.children].map(child => child.classList.remove("blinking"));
+      [...forecast_list.children].map(child => child.classList.remove("blinking"));
     }, BLINKING_TIME);
   });
 })();
 
-function getDirectionText(degrees) {
+function get_direction_text(degrees) {
   const index = Math.round(degrees / 45) % 8;
 
   return DIRECTIONS[index];
@@ -394,9 +394,9 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
   const sunset = [...document.querySelectorAll("[data-sunset]")];
   let forecast;
   let forecast_units;
-  let is_current_forecast_unique = isCurrentForecastUnique(data.daily[0].hourly, data.current);
+  let is_current_forecast_time_unique = is_current_forecast_unique(data.daily[0].hourly, data.current);
   if (selected_list === -1) {
-    if (is_current_forecast_unique === -1) {
+    if (is_current_forecast_time_unique === -1) {
       forecast = data.daily[day_index];
       forecast_units = data.daily_units;
       forecast_list_DOM_container.dataset.forecastList = 0;
@@ -409,7 +409,7 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
     forecast_units = data.daily_units;
   } else {
     if (hour_index === -1) {
-      if (is_current_forecast_unique === -1) {
+      if (is_current_forecast_time_unique === -1) {
         fallback_hour_index = parseInt(new Date().toLocaleTimeString().split(":")[0]);
         forecast = data.daily[day_index].hourly[fallback_hour_index];
         forecast_units = data.hourly_units;
@@ -426,8 +426,8 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
   if (forecast.time) {
     const forecast_date = new Date(forecast.time);
     const forecast_hours = forecast_date.getHours();
-    const isNight = forecast_hours >= 20 || forecast_hours <= 5;
-    if (isNight)
+    const is_night = forecast_hours >= 20 || forecast_hours <= 5;
+    if (is_night)
       Icon.get(forecast.weather_code, false).then(icon_URL => {
         selected_weather_icon.forEach(icon => {
           if (icon.src === icon_URL.default) return;
@@ -496,7 +496,7 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
   );
   set_direction_data(
     [...wind_direction],
-    [getDirectionText(forecast.wind_direction), forecast.wind_direction],
+    [get_direction_text(forecast.wind_direction), forecast.wind_direction],
     selected_toggle.direction
   );
 
@@ -556,18 +556,18 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
       element.dataset.toggleTwo = value[1];
     });
   }
-  if (display_forecast_list) displayWeatherForecasts(data, forecast_list_DOM_container);
+  if (display_forecast_list) display_weather_forecasts(data, forecast_list_DOM_container);
 }
 
 // This function displays daily or hourly forecast list
-function displayWeatherForecasts(data, forecast_list_DOM_container, isDaily = true) {
+function display_weather_forecasts(data, forecast_list_DOM_container, isDaily = true) {
   forecast_list_DOM_container.innerHTML = "";
 
   // Display daily forecast
   if (isDaily) {
     const forecast_list = data.daily;
     forecast_list.forEach((forecast, forecast_index) =>
-      forecast_list_DOM_container.appendChild(createDOMForecast(forecast, forecast_index, forecast_list_DOM_container))
+      forecast_list_DOM_container.appendChild(create_DOM_forecast(forecast, forecast_index, forecast_list_DOM_container))
     );
 
     // Add selected class to selected day
@@ -585,7 +585,7 @@ function displayWeatherForecasts(data, forecast_list_DOM_container, isDaily = tr
     const day_index = parseInt(forecast_list_DOM_container.dataset.day);
     const forecast_list = data.daily[day_index].hourly;
     forecast_list.forEach((forecast, forecast_index) =>
-      forecast_list_DOM_container.appendChild(createDOMForecast(forecast, forecast_index, forecast_list_DOM_container, false))
+      forecast_list_DOM_container.appendChild(create_DOM_forecast(forecast, forecast_index, forecast_list_DOM_container, false))
     );
 
     // Get current forecast's inserting index, -1 = there is a hourly forecast with the same time as current forecast
@@ -603,13 +603,13 @@ function displayWeatherForecasts(data, forecast_list_DOM_container, isDaily = tr
 
     // If the current forecast time isn't available in existing hourly forecast then add it to the DOM
     if (current_index !== -1 && day_index === 0) {
-      const insertingIndexElement = [...forecast_list_DOM_container.children][current_index];
-      const current_forecast = createDOMForecast(data.current, -1, forecast_list_DOM_container, false);
-      insertingIndexElement.after(current_forecast);
+      const inserting_index_element = [...forecast_list_DOM_container.children][current_index];
+      const current_forecast = create_DOM_forecast(data.current, -1, forecast_list_DOM_container, false);
+      inserting_index_element.after(current_forecast);
     }
 
     // Select current selected forecast
-    const hour = parseInt(forecastList.dataset.hour);
+    const hour = parseInt(forecast_list_DOM_container.dataset.hour);
     let selected_hour;
     if (hour !== -2) {
       if (hour === -1) selected_hour = document.querySelector(`.forecast-item[data-index="-1"]`);
@@ -625,7 +625,7 @@ function displayWeatherForecasts(data, forecast_list_DOM_container, isDaily = tr
   }
 }
 
-function createDOMForecast(forecast, forecast_index, forecast_list_DOM_container, isDaily = true) {
+function create_DOM_forecast(forecast, forecast_index, forecast_list_DOM_container, isDaily = true) {
   const selected_toggle = get_temperature_toggle();
   const li = document.createElement("li");
   li.classList.add("blinking");
@@ -682,8 +682,8 @@ function createDOMForecast(forecast, forecast_index, forecast_list_DOM_container
   if (forecast.time) {
     const forecast_date = new Date(forecast.time);
     const forecast_hours = forecast_date.getHours();
-    const isNight = forecast_hours >= 20 || forecast_hours <= 5;
-    if (isNight) Icon.get(forecast.weather_code, false).then(icon_URL => (icon.src = icon_URL.default));
+    const is_night = forecast_hours >= 20 || forecast_hours <= 5;
+    if (is_night) Icon.get(forecast.weather_code, false).then(icon_URL => (icon.src = icon_URL.default));
     else Icon.get(forecast.weather_code).then(icon_URL => (icon.src = icon_URL.default));
   } else Icon.get(forecast.weather_code).then(icon_URL => (icon.src = icon_URL.default));
 
@@ -713,8 +713,8 @@ function createDOMForecast(forecast, forecast_index, forecast_list_DOM_container
   return li;
 }
 
-function isCurrentForecastUnique(forecast_list, current_forecast) {
-  const [cHour, cMinute] = current_forecast.time
+function is_current_forecast_unique(forecast_list, current_forecast) {
+  const [c_hour, c_minute] = current_forecast.time
     .split("T")[1]
     .split(":")
     .map(time => parseInt(time));
@@ -723,7 +723,7 @@ function isCurrentForecastUnique(forecast_list, current_forecast) {
       .split("T")[1]
       .split(":")
       .map(time => parseInt(time));
-    return hour === cHour && minute !== cMinute;
+    return hour === c_hour && minute !== c_minute;
   });
   if (closest_time_index === -1) return false;
   return closest_time_index;
