@@ -21,6 +21,7 @@ const forecastList = document.getElementsByClassName("forecast-list")[0];
 
 const DIRECTIONS = ["North", "North-East", "East", "South-East", "South", "South-West", "West", "North-West"];
 const DEBOUNCE_DELAY = 250;
+const BLINKING_TIME = 250;
 let timeoutId;
 let weather_data;
 
@@ -234,27 +235,37 @@ const toggle_unit = {
   });
 
   daily_button.addEventListener("click", () => {
-    hourly_button.classList.remove("selected");
-    daily_button.classList.add("selected");
-    forecastList.dataset.forecastList = 0;
-    displayWeatherForecasts(Weather.format(weather_data), forecastList);
-    const day_index = parseInt(forecastList.dataset.day);
-    const selected_day = document.querySelector(`.forecast-item[data-index="${day_index}"]`);
-    if (selected_day) selected_day.scrollIntoView({ behavior: "smooth", inline: "center" });
+    if (daily_button.classList.contains("selected")) return;
+    [...forecastList.children].map(child => child.classList.add("blinking"));
+    setTimeout(() => {
+      hourly_button.classList.remove("selected");
+      daily_button.classList.add("selected");
+      forecastList.dataset.forecastList = 0;
+      displayWeatherForecasts(Weather.format(weather_data), forecastList);
+      const day_index = parseInt(forecastList.dataset.day);
+      const selected_day = document.querySelector(`.forecast-item[data-index="${day_index}"]`);
+      if (selected_day) selected_day.scrollIntoView({ behavior: "smooth", inline: "center" });
+      [...forecastList.children].map(child => child.classList.remove("blinking"));
+    }, BLINKING_TIME);
   });
   hourly_button.addEventListener("click", () => {
-    daily_button.classList.remove("selected");
-    hourly_button.classList.add("selected");
-    forecastList.dataset.forecastList = 1;
-    displayWeatherForecasts(Weather.format(weather_data), forecastList, false);
-    const hour_index = parseInt(forecastList.dataset.hour);
-    const selected_hour = document.querySelector(`.forecast-item[data-index="${hour_index}"]`);
-    if (selected_hour) selected_hour.scrollIntoView({ behavior: "smooth", inline: "center" });
-    else {
-      const date = new Date();
-      const current_hour = document.querySelector(`.forecast-item[data-index="${date.getHours()}"]`);
-      current_hour.scrollIntoView({ behavior: "smooth", inline: "center" });
-    }
+    if (hourly_button.classList.contains("selected")) return;
+    [...forecastList.children].map(child => child.classList.add("blinking"));
+    setTimeout(() => {
+      daily_button.classList.remove("selected");
+      hourly_button.classList.add("selected");
+      forecastList.dataset.forecastList = 1;
+      displayWeatherForecasts(Weather.format(weather_data), forecastList, false);
+      const hour_index = parseInt(forecastList.dataset.hour);
+      const selected_hour = document.querySelector(`.forecast-item[data-index="${hour_index}"]`);
+      if (selected_hour) selected_hour.scrollIntoView({ behavior: "smooth", inline: "center" });
+      else {
+        const date = new Date();
+        const current_hour = document.querySelector(`.forecast-item[data-index="${date.getHours()}"]`);
+        current_hour.scrollIntoView({ behavior: "smooth", inline: "center" });
+      }
+      [...forecastList.children].map(child => child.classList.remove("blinking"));
+    }, BLINKING_TIME);
   });
 })();
 
@@ -262,6 +273,14 @@ function getDirectionText(degrees) {
   const index = Math.round(degrees / 45) % 8;
 
   return DIRECTIONS[index];
+}
+
+function animate_blink(element, callback = null) {
+  element.classList.add("blinking");
+  setTimeout(() => {
+    if (callback) callback(element);
+    element.classList.remove("blinking");
+  }, BLINKING_TIME);
 }
 
 function displayWeatherData(data, forecast_list_DOM_container, display_forecast_list = false) {
@@ -321,9 +340,26 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
     const forecast_hours = forecast_date.getHours();
     const isNight = forecast_hours >= 20 || forecast_hours <= 5;
     if (isNight)
-      Icon.get(forecast.weather_code, false).then(icon_URL => selected_weather_icon.map(icon => (icon.src = icon_URL.default)));
-    else Icon.get(forecast.weather_code).then(icon_URL => selected_weather_icon.map(icon => (icon.src = icon_URL.default)));
-  } else Icon.get(forecast.weather_code).then(icon_URL => selected_weather_icon.map(icon => (icon.src = icon_URL.default)));
+      Icon.get(forecast.weather_code, false).then(icon_URL => {
+        selected_weather_icon.forEach(icon => {
+          if (icon.src === icon_URL.default) return;
+          animate_blink(icon, () => (icon.src = icon_URL.default));
+        });
+      });
+    else
+      Icon.get(forecast.weather_code).then(icon_URL => {
+        selected_weather_icon.forEach(icon => {
+          if (icon.src === icon_URL.default) return;
+          animate_blink(icon, () => (icon.src = icon_URL.default));
+        });
+      });
+  } else
+    Icon.get(forecast.weather_code).then(icon_URL => {
+      selected_weather_icon.forEach(icon => {
+        if (icon.src === icon_URL.default) return;
+        animate_blink(icon, () => (icon.src = icon_URL.default));
+      });
+    });
 
   const elements = [
     [...days],
@@ -378,13 +414,25 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
 
   function set_text_content(array_of_elements, array_of_text) {
     array_of_elements.forEach((element, index) => {
-      element.map(element => (element.textContent = array_of_text[index]));
+      element.forEach(element => {
+        if (element.textContent === array_of_text[index]) return;
+        animate_blink(element, () => (element.textContent = array_of_text[index]));
+      });
     });
   }
   function set_temperature_data(elements, array_of_values, value_index) {
     elements.forEach((element, index) => {
+      const parent_element = element.parentElement;
       const value = array_of_values[index];
-      element.textContent = `${value[value_index]}${["°C", "°F"][value_index]}`;
+      const new_text_content = `${value[value_index]}${["°C", "°F"][value_index]}`;
+      if (element.textContent === new_text_content) return;
+      if (
+        parent_element.classList.contains("min-max-temperature") ||
+        parent_element.classList.contains("feelslike-temperature")
+      ) {
+        animate_blink(parent_element, () => (element.textContent = new_text_content));
+      } else animate_blink(element, () => (element.textContent = new_text_content));
+
       element.dataset.toggleOne = value[0];
       element.dataset.toggleTwo = value[1];
     });
@@ -393,7 +441,8 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
     array_of_elements.forEach((elements, index) => {
       elements.forEach(element => {
         const value = array_of_values[index];
-        element.textContent = value[value_index];
+        if (element.textContent === value) return;
+        animate_blink(element, () => (element.textContent = value[value_index]));
         element.dataset.toggleOne = value[0];
         element.dataset.toggleTwo = value[1];
       });
@@ -402,7 +451,9 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
   function set_speed_data(elements, array_of_values, value_index) {
     elements.forEach(element => {
       const value = array_of_values;
-      element.textContent = `${value[value_index]} ${["km/h", "mph"][value_index]}`;
+      const new_text_content = `${value[value_index]} ${["km/h", "mph"][value_index]}`;
+      if (element.textContent === new_text_content) return;
+      animate_blink(element, () => (element.textContent = new_text_content));
       element.dataset.toggleOne = value[0];
       element.dataset.toggleTwo = value[1];
     });
@@ -410,7 +461,9 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
   function set_direction_data(elements, array_of_values, value_index) {
     elements.forEach(element => {
       const value = array_of_values;
-      element.textContent = `${value[value_index]} ${["", "°"][value_index]}`;
+      const new_text_content = `${value[value_index]} ${["", "°"][value_index]}`;
+      if (element.textContent === new_text_content) return;
+      animate_blink(element, () => (element.textContent = new_text_content));
       element.dataset.toggleOne = value[0];
       element.dataset.toggleTwo = value[1];
     });
@@ -487,6 +540,8 @@ function displayWeatherForecasts(data, forecast_list_DOM_container, isDaily = tr
 function createDOMForecast(forecast, forecast_index, forecast_list_DOM_container, isDaily = true) {
   const selected_toggle = get_temperature_toggle();
   const li = document.createElement("li");
+  li.classList.add("blinking");
+  setTimeout(() => li.classList.remove("blinking"), BLINKING_TIME);
   const button = document.createElement("button");
   button.classList.add("forecast-item");
   button.dataset.index = forecast_index;

@@ -226,7 +226,6 @@ main {
   justify-content: space-between;
   width: 100%;
   white-space: nowrap;
-  padding-top: 0.5rem;
 }
 .day-time {
   position: relative;
@@ -234,8 +233,7 @@ main {
 .time {
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.5s ease;
-  transition-delay: 0s;
+  transition: opacity 0.25s ease;
 }
 .date {
   position: absolute;
@@ -255,12 +253,12 @@ main {
 .selected-weather-forecast.visible-time .time {
   pointer-events: initial;
   opacity: 1;
-  transition-delay: 0.25s;
 }
 .temperature-icon {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
   margin-top: 1.5rem;
 }
 .min-max-temperature {
@@ -885,7 +883,8 @@ main {
   }
   .temperature-icon {
     margin: unset;
-    justify-content: space-around;
+    justify-content: space-between;
+    padding: 0 4rem;
     flex: 1;
   }
   .temperatures {
@@ -939,4 +938,20 @@ main {
 /* Inherit font-family on button */
 button {
   font-family: inherit;
+}
+
+/* Blinking Transition */
+.blinking {
+  transition-delay: 0s !important;
+  opacity: 0 !important;
+}
+.day,
+.label-value > .value,
+.selected-weather-icon,
+.selected-weather-condition,
+.min-max-temperature,
+.temperature,
+.feelslike-temperature,
+.forecast-list > li {
+  transition: opacity 0.25s;
 }
