@@ -238,12 +238,23 @@ const toggle_unit = {
     daily_button.classList.add("selected");
     forecastList.dataset.forecastList = 0;
     displayWeatherForecasts(Weather.format(weather_data), forecastList);
+    const day_index = parseInt(forecastList.dataset.day);
+    const selected_day = document.querySelector(`.forecast-item[data-index="${day_index}"]`);
+    if (selected_day) selected_day.scrollIntoView({ behavior: "smooth", inline: "center" });
   });
   hourly_button.addEventListener("click", () => {
     daily_button.classList.remove("selected");
     hourly_button.classList.add("selected");
     forecastList.dataset.forecastList = 1;
     displayWeatherForecasts(Weather.format(weather_data), forecastList, false);
+    const hour_index = parseInt(forecastList.dataset.hour);
+    const selected_hour = document.querySelector(`.forecast-item[data-index="${hour_index}"]`);
+    if (selected_hour) selected_hour.scrollIntoView({ behavior: "smooth", inline: "center" });
+    else {
+      const date = new Date();
+      const current_hour = document.querySelector(`.forecast-item[data-index="${date.getHours()}"]`);
+      current_hour.scrollIntoView({ behavior: "smooth", inline: "center" });
+    }
   });
 })();
 
@@ -351,7 +362,6 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
   ];
   set_time_data(time_elements, time_element_values, selected_toggle.time);
   if (forecast.time) {
-    console.log(forecast.time, format.time(forecast.time, true));
     set_time_data([[...times]], [[format.time(forecast.time, true), format.time(forecast.time)]], selected_toggle.time);
   }
   set_speed_data(
@@ -470,7 +480,6 @@ function displayWeatherForecasts(data, forecast_list_DOM_container, isDaily = tr
     }
     const DOM_hour_index = parseInt(forecast_list_DOM_container.dataset.hour);
     if (DOM_hour_index !== -2) selected_hour.classList.add("selected");
-    selected_hour.scrollIntoView({ behavior: "smooth", inline: "center" });
   }
 }
 
