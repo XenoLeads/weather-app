@@ -19,7 +19,9 @@ const daily_button = document.getElementById("daily-button");
 const hourly_button = document.getElementById("hourly-button");
 const forecast_list = document.getElementsByClassName("forecast-list")[0];
 const loading_panel_container = document.getElementsByClassName("loading-panel-container")[0];
+const loading_text_location_name = document.getElementsByClassName("loading-text-location-name")[0];
 const notification_panel_container = document.getElementsByClassName("notification-panel-container")[0];
+const notification_text_location_name = document.getElementsByClassName("notification-text-location-name")[0];
 const notification_dismiss_button = document.getElementsByClassName("notification-dismiss-button")[0];
 const background_overlay = document.getElementsByClassName("background-overlay")[0];
 
@@ -232,6 +234,10 @@ function manage_panels(panel = null, show = true, show_overlay = true) {
   else background_overlay.classList.remove("visible");
 }
 
+function capitalize(string) {
+  return string[0].toUpperCase() + string.slice(1).toLowerCase();
+}
+
 // Initialization IIFE
 (() => {
   // Add keyboard support
@@ -293,6 +299,7 @@ function manage_panels(panel = null, show = true, show_overlay = true) {
   search_button.addEventListener("click", () => {
     const value = search_input.value.trim();
     if (value && value.length > 0) {
+      loading_text_location_name.textContent = capitalize(value);
       manage_panels("loading");
       Weather.get(value)
         .then(response => {
@@ -308,6 +315,7 @@ function manage_panels(panel = null, show = true, show_overlay = true) {
           console.error(error);
           setTimeout(() => {
             manage_panels("loading", false, true);
+            notification_text_location_name.textContent = capitalize(value);
             manage_panels("notification", true, true);
           }, 500);
         });
