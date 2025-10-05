@@ -18,6 +18,7 @@ const mobile_details_dismiss_button = document.getElementsByClassName("mobile-de
 const daily_button = document.getElementById("daily-button");
 const hourly_button = document.getElementById("hourly-button");
 const forecastList = document.getElementsByClassName("forecast-list")[0];
+const loading_panel_container = document.getElementsByClassName("loading-panel-container")[0];
 
 const DIRECTIONS = ["North", "North-East", "East", "South-East", "South", "South-West", "West", "North-West"];
 const DEBOUNCE_DELAY = 250;
@@ -211,6 +212,7 @@ const toggle_unit = {
   searchButton.addEventListener("click", () => {
     const value = searchInput.value.trim();
     if (value && value.length > 0) {
+      loading_panel_container.classList.add("visible");
       Weather.get(value)
         .then(response => {
           // Cache succesfully fetched weather data
@@ -222,7 +224,8 @@ const toggle_unit = {
         })
         .catch(error => {
           console.error(error);
-        });
+        })
+        .finally(() => setTimeout(() => loading_panel_container.classList.remove("visible"), 500));
     }
   });
   clearSearchButton.addEventListener("click", () => (searchInput.value = ""));
