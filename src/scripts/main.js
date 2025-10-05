@@ -235,7 +235,10 @@ function manage_panels(panel = null, show = true, show_overlay = true) {
 }
 
 function capitalize(string) {
-  return string[0].toUpperCase() + string.slice(1).toLowerCase();
+  return string
+    .split(" ")
+    .map(capitalized_string => capitalized_string[0].toUpperCase() + capitalized_string.slice(1).toLowerCase())
+    .join(" ");
 }
 
 // Initialization IIFE
