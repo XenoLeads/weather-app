@@ -307,6 +307,9 @@ function capitalize(string) {
           localStorage.setItem("weather_data", JSON.stringify(response));
           weather_data = response;
           search_input.value = "";
+          forecast_list.dataset.day = 0;
+          forecast_list.dataset.hour = -1;
+          forecast_list.dataset.forecastList = -1;
           displayWeatherData(Weather.format(response), forecast_list, true);
           hourly_button.classList.remove("selected");
           daily_button.classList.add("selected");
