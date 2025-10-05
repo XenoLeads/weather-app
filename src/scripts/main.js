@@ -514,7 +514,7 @@ function displayWeatherForecasts(data, forecast_list_DOM_container, isDaily = tr
     });
 
     // If the current forecast time isn't available in existing hourly forecast then add it to the DOM
-    if (current_index !== -1) {
+    if (current_index !== -1 && day_index === 0) {
       const insertingIndexElement = [...forecast_list_DOM_container.children][current_index];
       const current_forecast = createDOMForecast(data.current, -1, forecast_list_DOM_container, false);
       insertingIndexElement.after(current_forecast);
