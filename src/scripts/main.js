@@ -19,6 +19,9 @@ const daily_button = document.getElementById("daily-button");
 const hourly_button = document.getElementById("hourly-button");
 const forecastList = document.getElementsByClassName("forecast-list")[0];
 const loading_panel_container = document.getElementsByClassName("loading-panel-container")[0];
+const notification_panel_container = document.getElementsByClassName("notification-panel-container")[0];
+const notification_dismiss_button = document.getElementsByClassName("notification-dismiss-button")[0];
+const background_overlay = document.getElementsByClassName("background-overlay")[0];
 
 const DIRECTIONS = ["North", "North-East", "East", "South-East", "South", "South-West", "West", "North-West"];
 const DEBOUNCE_DELAY = 250;
@@ -155,6 +158,79 @@ const toggle_unit = {
     });
   },
 };
+function manage_panels(panel = null, show = true, show_overlay = true) {
+  if (panel) {
+    if (Array.isArray(panel)) {
+      panel.forEach(panel => {
+        if (show) {
+          switch (panel) {
+            case "mobile_details":
+              mobile_details_panel_container.classList.add("visible");
+              break;
+            case "unit_conversion":
+              unit_conversion_panel_container.classList.add("visible");
+              break;
+            case "loading":
+              loading_panel_container.classList.add("visible");
+              break;
+            case "notification":
+              notification_panel_container.classList.add("visible");
+              break;
+          }
+        } else {
+          switch (panel) {
+            case "mobile_details":
+              mobile_details_panel_container.classList.remove("visible");
+              break;
+            case "unit_conversion":
+              unit_conversion_panel_container.classList.remove("visible");
+              break;
+            case "loading":
+              loading_panel_container.classList.remove("visible");
+              break;
+            case "notification":
+              notification_panel_container.classList.remove("visible");
+              break;
+          }
+        }
+      });
+    } else {
+      if (show) {
+        switch (panel) {
+          case "mobile_details":
+            mobile_details_panel_container.classList.add("visible");
+            break;
+          case "unit_conversion":
+            unit_conversion_panel_container.classList.add("visible");
+            break;
+          case "loading":
+            loading_panel_container.classList.add("visible");
+            break;
+          case "notification":
+            notification_panel_container.classList.add("visible");
+            break;
+        }
+      } else {
+        switch (panel) {
+          case "mobile_details":
+            mobile_details_panel_container.classList.remove("visible");
+            break;
+          case "unit_conversion":
+            unit_conversion_panel_container.classList.remove("visible");
+            break;
+          case "loading":
+            loading_panel_container.classList.remove("visible");
+            break;
+          case "notification":
+            notification_panel_container.classList.remove("visible");
+            break;
+        }
+      }
+    }
+  }
+  if (show_overlay) background_overlay.classList.add("visible");
+  else background_overlay.classList.remove("visible");
+}
 
 // Initialization IIFE
 (() => {
@@ -180,10 +256,10 @@ const toggle_unit = {
   }
 
   unit_conversion_button.addEventListener("click", () => {
-    unit_conversion_panel_container.classList.add("visible");
+    manage_panels("unit_conversion");
   });
   unit_conversion_panel_done_button.addEventListener("click", () => {
-    unit_conversion_panel_container.classList.remove("visible");
+    manage_panels("unit_conversion", false, false);
   });
   unit_toggle_containers.forEach(unit_toggle_container => {
     const siblings = [...unit_toggle_container.children];
@@ -196,6 +272,11 @@ const toggle_unit = {
         toggle_unit[toggle_label](index);
       });
     });
+  });
+
+  notification_dismiss_button.addEventListener("click", () => {
+    background_overlay.classList.remove("visible");
+    notification_panel_container.classList.remove("visible");
   });
 
   // Show suggestions after typing
@@ -212,7 +293,7 @@ const toggle_unit = {
   searchButton.addEventListener("click", () => {
     const value = searchInput.value.trim();
     if (value && value.length > 0) {
-      loading_panel_container.classList.add("visible");
+      manage_panels("loading");
       Weather.get(value)
         .then(response => {
           // Cache succesfully fetched weather data
@@ -221,20 +302,24 @@ const toggle_unit = {
           searchInput.value = "";
           displayWeatherData(Weather.format(response), forecastList, true);
           searchInput.blur();
+          manage_panels("loading", false, false);
         })
         .catch(error => {
           console.error(error);
-        })
-        .finally(() => setTimeout(() => loading_panel_container.classList.remove("visible"), 500));
+          setTimeout(() => {
+            manage_panels("loading", false, true);
+            manage_panels("notification", true, true);
+          }, 500);
+        });
     }
   });
   clearSearchButton.addEventListener("click", () => (searchInput.value = ""));
 
   mobile_details_button.addEventListener("click", () => {
-    mobile_details_panel_container.classList.add("visible");
+    manage_panels("mobile_details", true, false);
   });
   mobile_details_dismiss_button.addEventListener("click", () => {
-    mobile_details_panel_container.classList.remove("visible");
+    manage_panels("mobile_details", false, false);
   });
 
   daily_button.addEventListener("click", () => {

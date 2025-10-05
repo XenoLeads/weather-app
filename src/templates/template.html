@@ -310,6 +310,8 @@
             </li>
           </ul>
         </section>
+
+        <div class="background-overlay"></div>
         <section
           class="unit-conversion-panel-container"
           data-selected-temperature-toggle="1"
@@ -317,7 +319,6 @@
           data-selected-speed-toggle="1"
           data-selected-direction-toggle="1"
         >
-          <div class="unit-conversion-panel-overlay"></div>
           <div class="unit-conversion-panel">
             <div class="unit-conversion-container">
               <h2 class="unit-conversion-heading">Temperature</h2>
@@ -351,10 +352,16 @@
           </div>
         </section>
         <section class="loading-panel-container">
-          <div class="loading-panel-overlay"></div>
           <div class="loading-panel">
             <div class="loading-icon"></div>
             <p class="loading-text">Fetching Weather Data...</p>
+          </div>
+        </section>
+        <section class="notification-panel-container">
+          <div class="notification-panel">
+            <h2 class="notification-heading">Fetching Failed!</h2>
+            <p class="notification-text">Couldn't find the location, try again with different location name.</p>
+            <button class="notification-dismiss-button">Dismiss</button>
           </div>
         </section>
       </main>
