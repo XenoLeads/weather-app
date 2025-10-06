@@ -615,7 +615,8 @@ button {
 .min-max-temperature,
 .temperature,
 .feelslike-temperature,
-.forecast-list > li {
+.forecast-list > li,
+.weather-desktop-detail-icon {
   transition: opacity 0.25s;
 }
 

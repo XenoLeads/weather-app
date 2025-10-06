@@ -406,6 +406,7 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
   const pressure = [...document.querySelectorAll("[data-pressure]")];
   const uv_index = [...document.querySelectorAll("[data-uv-index]")];
   const wind_speed = [...document.querySelectorAll("[data-wind-speed]")];
+  const wind_direction_icon = [...document.querySelectorAll("[data-wind-direction-icon]")];
   const wind_direction = [...document.querySelectorAll("[data-wind-direction]")];
   const sunrise = [...document.querySelectorAll("[data-sunrise]")];
   const sunset = [...document.querySelectorAll("[data-sunset]")];
@@ -513,6 +514,7 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
   );
   set_direction_data(
     [...wind_direction],
+    [...wind_direction_icon],
     [get_direction_text(forecast.wind_direction), forecast.wind_direction],
     selected_toggle.direction
   );
@@ -563,11 +565,23 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
       element.dataset.toggleTwo = value[1];
     });
   }
-  function set_direction_data(elements, array_of_values, value_index) {
+  function set_direction_data(elements, icon_elements, array_of_values, value_index) {
     elements.forEach(element => {
       const value = array_of_values;
       const new_text_content = `${value[value_index]} ${["", "°"][value_index]}`;
       if (element.textContent === new_text_content) return;
+      icon_elements.map(icon => {
+        animate_blink(icon, () => {
+          const direction_text = value[0]
+            .split("-")
+            .map(text => text.toLowerCase())
+            .join("-");
+          import(`../assets/icons/weather-details/wind-directions/${direction_text}.svg`).then(module => {
+            const icon_url = module.default;
+            icon.src = icon_url;
+          });
+        });
+      });
       animate_blink(element, () => (element.textContent = new_text_content));
       element.dataset.toggleOne = value[0];
       element.dataset.toggleTwo = value[1];
