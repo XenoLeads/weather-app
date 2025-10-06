@@ -120,13 +120,28 @@ const toggle_unit = {
     unit_conversion_panel_container.dataset.selectedTemperatureToggle = index + 1;
     const temperatures = [
       ...document.querySelectorAll("[data-temperature]"),
+      ...document.querySelectorAll("[data-feelslike-temperature]"),
       document.querySelector("[data-min-temperature]"),
       document.querySelector("[data-max-temperature]"),
     ];
     temperatures.map(temperature => {
-      const values = [parseFloat(temperature.dataset.toggleOne), parseFloat(temperature.dataset.toggleTwo)];
-      const units = ["°C", "°F"];
-      temperature.textContent = `${values[index]}${units[index]}`;
+      const parent_element = temperature.parentElement;
+      if (
+        parent_element.classList.contains("min-max-temperature") ||
+        parent_element.classList.contains("feelslike-temperature")
+      ) {
+        animate_blink(parent_element, () => {
+          const values = [parseFloat(temperature.dataset.toggleOne), parseFloat(temperature.dataset.toggleTwo)];
+          const units = ["°C", "°F"];
+          temperature.textContent = `${values[index]}${units[index]}`;
+        });
+      } else {
+        animate_blink(temperature, () => {
+          const values = [parseFloat(temperature.dataset.toggleOne), parseFloat(temperature.dataset.toggleTwo)];
+          const units = ["°C", "°F"];
+          temperature.textContent = `${values[index]}${units[index]}`;
+        });
+      }
     });
   },
   time: index => {
@@ -137,8 +152,10 @@ const toggle_unit = {
       ...document.querySelectorAll("[data-sunset]"),
     ];
     times.map(time => {
-      const values = [time.dataset.toggleOne, time.dataset.toggleTwo];
-      time.textContent = values[index];
+      animate_blink(time, () => {
+        const values = [time.dataset.toggleOne, time.dataset.toggleTwo];
+        time.textContent = values[index];
+      });
     });
   },
   speed: index => {
@@ -146,8 +163,10 @@ const toggle_unit = {
     const speeds = [...document.querySelectorAll("[data-wind-speed]")];
     const units = ["km/h", "mph"];
     speeds.map(speed => {
-      const values = [parseFloat(speed.dataset.toggleOne), parseFloat(speed.dataset.toggleTwo)];
-      speed.textContent = `${values[index]} ${units[index]}`;
+      animate_blink(speed, () => {
+        const values = [parseFloat(speed.dataset.toggleOne), parseFloat(speed.dataset.toggleTwo)];
+        speed.textContent = `${values[index]} ${units[index]}`;
+      });
     });
   },
   direction: index => {
@@ -155,8 +174,10 @@ const toggle_unit = {
     const directions = [...document.querySelectorAll("[data-wind-direction]")];
     const units = ["", "°"];
     directions.map(direction => {
-      const values = [direction.dataset.toggleOne, parseFloat(direction.dataset.toggleTwo)];
-      direction.textContent = `${values[index]}${units[index]}`;
+      animate_blink(direction, () => {
+        const values = [direction.dataset.toggleOne, parseFloat(direction.dataset.toggleTwo)];
+        direction.textContent = `${values[index]}${units[index]}`;
+      });
     });
   },
 };

@@ -616,7 +616,9 @@ button {
 .temperature,
 .feelslike-temperature,
 .forecast-list > li,
-.weather-desktop-detail-icon {
+.weather-desktop-detail-icon,
+.forecast-temperature,
+.forecast-time {
   transition: opacity 0.25s;
 }
 
