@@ -28,6 +28,19 @@
   font-style: normal;
 }
 
+/* Weather Data Attribution */
+.weather-data-attribution {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  color: white;
+  font-size: 0.8rem;
+  transform: translateX(-50%);
+  padding-bottom: 0.2rem;
+  white-space: nowrap;
+  opacity: 0.8;
+}
+
 *,
 *::before,
 *::after {
