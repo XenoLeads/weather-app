@@ -313,6 +313,7 @@ function capitalize(string) {
           forecast_list.dataset.day = 0;
           forecast_list.dataset.hour = -1;
           forecast_list.dataset.forecastList = -1;
+          forecast_list.dataset.selectedForecastType = "current";
           displayWeatherData(Weather.format(response), forecast_list, true);
           hourly_button.classList.remove("selected");
           daily_button.classList.add("selected");
