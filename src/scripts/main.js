@@ -568,7 +568,7 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
   function set_direction_data(elements, icon_elements, array_of_values, value_index) {
     elements.forEach(element => {
       const value = array_of_values;
-      const new_text_content = `${value[value_index]} ${["", "°"][value_index]}`;
+      const new_text_content = `${value[value_index]}${["", "°"][value_index]}`;
       if (element.textContent === new_text_content) return;
       icon_elements.map(icon => {
         animate_blink(icon, () => {
