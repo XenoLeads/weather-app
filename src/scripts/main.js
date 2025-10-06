@@ -543,7 +543,7 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
   function set_text_content(array_of_elements, array_of_text) {
     array_of_elements.forEach((element, index) => {
       element.forEach(element => {
-        if (element.textContent === array_of_text[index]) return;
+        if (element.textContent === (array_of_text[index]).toString()) return;
         animate_blink(element, () => (element.textContent = array_of_text[index]));
       });
     });
