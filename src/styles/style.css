@@ -206,6 +206,82 @@ header {
   object-fit: contain;
 }
 
+/* Allow Location */
+.current-location-search-button {
+  height: 2rem;
+  aspect-ratio: 1/1;
+  background: none;
+  border: 2px solid white;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.current-location-search-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.current-location-search-button:active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+.location-notification-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+.location-notification {
+  border: 2px solid white;
+  width: 80vmin;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 0.4rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+  opacity: 0;
+  transform: translateY(-200%) scaleY(0);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.location-notification-panel.visible > .location-notification {
+  transform: translateY(0%) scaleY(1);
+  opacity: 1;
+  pointer-events: all;
+}
+.location-notification-heading {
+  width: 100%;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.8);
+  padding-bottom: 0.4rem;
+}
+.location-notification-dimiss-button {
+  background: none;
+  outline: none;
+  border: 2px solid white;
+  padding: 0.4rem 1rem;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  color: inherit;
+  transition: background-color 0.25s ease;
+}
+.location-notification-dimiss-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.location-notification-dimiss-button:hover {
+  transition: background-color 0.15s ease;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+.current-location-search-unit-conversion-button-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
 /* Main */
 main {
   flex: 1;
@@ -630,7 +706,9 @@ button {
 .forecast-list > li,
 .weather-desktop-detail-icon,
 .forecast-temperature,
-.forecast-time {
+.forecast-time,
+.location-notification-heading,
+.location-notification-text {
   transition: opacity 0.25s;
 }
 
@@ -954,6 +1032,12 @@ button {
   .notification-panel {
     width: 50vmin;
   }
+  .current-location-search-button {
+    height: 3rem;
+  }
+  .location-notification {
+    width: 50vmin;
+  }
 }
 
 /* Desktop */
@@ -1147,6 +1231,12 @@ button {
     font-size: 1.5rem;
   }
   .notification-panel {
+    width: 50vmin;
+  }
+  .current-location-search-button {
+    height: 2.5rem;
+  }
+  .location-notification {
     width: 50vmin;
   }
 }

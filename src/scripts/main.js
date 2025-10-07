@@ -24,10 +24,55 @@ const notification_panel_container = document.getElementsByClassName("notificati
 const notification_text_location_name = document.getElementsByClassName("notification-text-location-name")[0];
 const notification_dismiss_button = document.getElementsByClassName("notification-dismiss-button")[0];
 const background_overlay = document.getElementsByClassName("background-overlay")[0];
+const location_notification_panel = document.getElementsByClassName("location-notification-panel")[0];
+const allow_location_button = document.getElementsByClassName("current-location-search-button")[0];
+const location_notification_dimiss_button = document.getElementsByClassName("location-notification-dimiss-button")[0];
+const location_notification_heading = document.getElementsByClassName("location-notification-heading")[0];
+const location_notification_text = document.getElementsByClassName("location-notification-text")[0];
 
 const DIRECTIONS = ["North", "North-East", "East", "South-East", "South", "South-West", "West", "North-West"];
 const DEBOUNCE_DELAY = 250;
 const BLINKING_TIME = 250;
+const LOCATION_PERMISSION_NOTIFICATION_TEXTS = {
+  // Initial request
+  requesting: {
+    heading: "Location Access Required",
+    message: "Allow location access to display the current weather forecast for your area.",
+  },
+
+  // Permission denied
+  denied: {
+    heading: "Location Permission Denied",
+    message:
+      "Weather information cannot be displayed without location access. Enable location permission in your browser settings to continue.",
+  },
+
+  // When trying to use location after denial
+  retryDenied: {
+    heading: "Location Access Blocked",
+    message:
+      "Location permission has been blocked in your browser settings. Enable it to retrieve weather information for your area.",
+  },
+
+  // When location is unavailable
+  unavailable: {
+    heading: "Location Unavailable",
+    message: "Your device's location could not be determined. Check your connection or GPS settings and try again.",
+  },
+
+  // When request times out
+  timeout: {
+    heading: "Request Timed Out",
+    message: "The location request took too long to respond. Try again.",
+  },
+};
+
+const LOCATION_CONFIG = {
+  enableHighAccuracy: true,
+  timeout: 5000,
+  maximumAge: 0,
+};
+
 let timeout_id;
 let weather_data;
 
@@ -60,6 +105,245 @@ const format = {
     return new Intl.DateTimeFormat(locale, options).format(date_obj);
   },
 };
+
+// Initialization IIFE
+(() => {
+  // Add keyboard support
+  window.addEventListener("keydown", e => {
+    if (!e.key) return;
+    const pressed_key = e.key.toLowerCase();
+    if (pressed_key === "enter") search_button.click();
+  });
+  window.addEventListener("resize", update_screen_label);
+  update_screen_label();
+
+  // Fix elements' animation on initial load
+  window.onload = () => {
+    container.removeAttribute("style");
+  };
+
+  // Display locally cached weather data if available
+  const local_weather_data = JSON.parse(localStorage.getItem("weather_data"));
+  if (local_weather_data) {
+    weather_data = local_weather_data;
+    displayWeatherData(Weather.format(weather_data), forecast_list, true);
+  }
+
+  unit_conversion_button.addEventListener("click", () => {
+    manage_panels("unit_conversion");
+  });
+  unit_conversion_panel_done_button.addEventListener("click", () => {
+    manage_panels("unit_conversion", false, false);
+  });
+  unit_toggle_containers.forEach(unit_toggle_container => {
+    const siblings = [...unit_toggle_container.children];
+    const toggle_label = unit_toggle_container.dataset.unitToggle;
+    siblings.forEach((toggle, index) => {
+      toggle.addEventListener("click", () => {
+        if (toggle.classList.contains("selected")) return;
+        siblings.map(sibling => sibling.classList.remove("selected"));
+        toggle.classList.add("selected");
+        toggle_unit[toggle_label](index);
+      });
+    });
+  });
+
+  notification_dismiss_button.addEventListener("click", () => {
+    background_overlay.classList.remove("visible");
+    notification_panel_container.classList.remove("visible");
+  });
+
+  allow_location_button.addEventListener("click", search_user_location_weater_forecast);
+  location_notification_dimiss_button.addEventListener("click", () => {
+    manage_panels("location_notification", false, false);
+  });
+
+  // Show suggestions after typing
+  search_input.addEventListener("input", () => {
+    const value = search_input.value.trim();
+    if (value.length < 3) return;
+    // Debounce the API call to avoid making a request for every keystroke
+    clearTimeout(timeout_id);
+    timeout_id = setTimeout(() => {
+      show_suggestions(value);
+    }, DEBOUNCE_DELAY);
+  });
+
+  search_button.addEventListener("click", () => search(search_input.value.trim()));
+  clear_search_button.addEventListener("click", () => (search_input.value = ""));
+
+  mobile_details_button.addEventListener("click", () => {
+    manage_panels("mobile_details", true, false);
+  });
+  mobile_details_dismiss_button.addEventListener("click", () => {
+    manage_panels("mobile_details", false, false);
+  });
+
+  daily_button.addEventListener("click", () => {
+    if (daily_button.classList.contains("selected")) return;
+    [...forecast_list.children].map(child => child.classList.add("blinking"));
+    setTimeout(() => {
+      hourly_button.classList.remove("selected");
+      daily_button.classList.add("selected");
+      forecast_list.dataset.forecastList = 0;
+      display_weather_forecasts(Weather.format(weather_data), forecast_list);
+      const day_index = parseInt(forecast_list.dataset.day);
+      const selected_day = document.querySelector(`.forecast-item[data-index="${day_index}"]`);
+      if (selected_day) selected_day.scrollIntoView({ behavior: "smooth", inline: "center" });
+      [...forecast_list.children].map(child => child.classList.remove("blinking"));
+    }, BLINKING_TIME);
+  });
+  hourly_button.addEventListener("click", () => {
+    if (hourly_button.classList.contains("selected")) return;
+    [...forecast_list.children].map(child => child.classList.add("blinking"));
+    setTimeout(() => {
+      daily_button.classList.remove("selected");
+      hourly_button.classList.add("selected");
+      forecast_list.dataset.forecastList = 1;
+      display_weather_forecasts(Weather.format(weather_data), forecast_list, false);
+      const hour_index = parseInt(forecast_list.dataset.hour);
+      const selected_hour = document.querySelector(`.forecast-item[data-index="${hour_index}"]`);
+      if (selected_hour) selected_hour.scrollIntoView({ behavior: "smooth", inline: "center" });
+      else {
+        const date = new Date();
+        const current_hour = document.querySelector(`.forecast-item[data-index="${date.getHours()}"]`);
+        current_hour.scrollIntoView({ behavior: "smooth", inline: "center" });
+      }
+      [...forecast_list.children].map(child => child.classList.remove("blinking"));
+    }, BLINKING_TIME);
+  });
+})();
+
+function heading_location_error(error) {
+  console.error(error);
+  switch (error.code) {
+    case 1:
+      animate_blink([location_notification_heading, location_notification_text], () => {
+        show_location_notification(
+          LOCATION_PERMISSION_NOTIFICATION_TEXTS.denied.heading,
+          LOCATION_PERMISSION_NOTIFICATION_TEXTS.denied.message
+        );
+      });
+      break;
+    case 2:
+      animate_blink([location_notification_heading, location_notification_text], () => {
+        show_location_notification(
+          LOCATION_PERMISSION_NOTIFICATION_TEXTS.unavailable.heading,
+          LOCATION_PERMISSION_NOTIFICATION_TEXTS.unavailable.message
+        );
+      });
+      break;
+    case 2:
+      animate_blink([location_notification_heading, location_notification_text], () => {
+        show_location_notification(
+          LOCATION_PERMISSION_NOTIFICATION_TEXTS.timeout.heading,
+          LOCATION_PERMISSION_NOTIFICATION_TEXTS.timeout.message
+        );
+      });
+      break;
+  }
+}
+
+function reset_forecast_data_indexes(forecast_list) {
+  forecast_list.dataset.day = 0;
+  forecast_list.dataset.hour = -1;
+  forecast_list.dataset.forecastList = -1;
+  forecast_list.dataset.selectedForecastType = "current";
+}
+
+function search(value, coordinates = null, timezone = null) {
+  if (coordinates) {
+    loading_text_location_name.textContent = "Your Location";
+    manage_panels("loading");
+    Weather.get(value, coordinates, timezone)
+      .then(response => {
+        // Cache succesfully fetched weather data
+        localStorage.setItem("weather_data", JSON.stringify(response));
+        weather_data = response;
+        search_input.value = "";
+        reset_forecast_data_indexes(forecast_list);
+        displayWeatherData(Weather.format(response), forecast_list, true);
+        hourly_button.classList.remove("selected");
+        daily_button.classList.add("selected");
+        search_input.blur();
+        setTimeout(() => manage_panels("loading", false, false), 500);
+      })
+      .catch(error => {
+        console.error(error);
+        setTimeout(() => {
+          manage_panels("loading", false, true);
+          notification_text_location_name.textContent = capitalize(value);
+          manage_panels("notification", true, true);
+        }, 500);
+      });
+  } else {
+    if (value && value.length > 0) {
+      loading_text_location_name.textContent = capitalize(value);
+      manage_panels("loading");
+      Weather.get(value)
+        .then(response => {
+          // Cache succesfully fetched weather data
+          localStorage.setItem("weather_data", JSON.stringify(response));
+          weather_data = response;
+          search_input.value = "";
+          reset_forecast_data_indexes(forecast_list);
+          displayWeatherData(Weather.format(response), forecast_list, true);
+          hourly_button.classList.remove("selected");
+          daily_button.classList.add("selected");
+          search_input.blur();
+          setTimeout(() => manage_panels("loading", false, false), 500);
+        })
+        .catch(error => {
+          console.error(error);
+          setTimeout(() => {
+            manage_panels("loading", false, true);
+            notification_text_location_name.textContent = capitalize(value);
+            manage_panels("notification", true, true);
+          }, 500);
+        });
+    }
+  }
+}
+
+function search_user_location_weater_forecast() {
+  if ("geolocation" in navigator) {
+    navigator.permissions.query({ name: "geolocation" }).then(function (result) {
+      if (result.state === "granted") {
+        navigator.geolocation.getCurrentPosition(search_current_location, heading_location_error, LOCATION_CONFIG);
+      } else if (result.state === "prompt") {
+        show_location_notification(
+          LOCATION_PERMISSION_NOTIFICATION_TEXTS.requesting.heading,
+          LOCATION_PERMISSION_NOTIFICATION_TEXTS.requesting.message
+        );
+        navigator.geolocation.getCurrentPosition(
+          async position => {
+            await search_current_location(position);
+            manage_panels("location_notification", false, false);
+          },
+          heading_location_error,
+          LOCATION_CONFIG
+        );
+      } else if (result.state === "denied") {
+        show_location_notification(
+          LOCATION_PERMISSION_NOTIFICATION_TEXTS.retryDenied.heading,
+          LOCATION_PERMISSION_NOTIFICATION_TEXTS.retryDenied.message
+        );
+      }
+    });
+  } else show_location_notification("Error", "Geolocation is not supported by your browser.");
+
+  function search_current_location(position) {
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    search(`Your Location`, [latitude, longitude], timezone);
+  }
+}
+function show_location_notification(heading = null, text = null) {
+  if (heading) location_notification_heading.textContent = heading;
+  if (text) location_notification_text.textContent = text;
+  manage_panels("location_notification", true, true);
+}
 
 function show_suggestions(location_name) {
   Weather.geocode(location_name).then(geocode => {
@@ -182,73 +466,22 @@ const toggle_unit = {
   },
 };
 function manage_panels(panel = null, show = true, show_overlay = true) {
+  const keymap = {
+    mobile_details: mobile_details_panel_container,
+    unit_conversion: unit_conversion_panel_container,
+    loading: loading_panel_container,
+    notification: notification_panel_container,
+    location_notification: location_notification_panel,
+  };
   if (panel) {
     if (Array.isArray(panel)) {
       panel.forEach(panel => {
-        if (show) {
-          switch (panel) {
-            case "mobile_details":
-              mobile_details_panel_container.classList.add("visible");
-              break;
-            case "unit_conversion":
-              unit_conversion_panel_container.classList.add("visible");
-              break;
-            case "loading":
-              loading_panel_container.classList.add("visible");
-              break;
-            case "notification":
-              notification_panel_container.classList.add("visible");
-              break;
-          }
-        } else {
-          switch (panel) {
-            case "mobile_details":
-              mobile_details_panel_container.classList.remove("visible");
-              break;
-            case "unit_conversion":
-              unit_conversion_panel_container.classList.remove("visible");
-              break;
-            case "loading":
-              loading_panel_container.classList.remove("visible");
-              break;
-            case "notification":
-              notification_panel_container.classList.remove("visible");
-              break;
-          }
-        }
+        if (show && Object.keys(keymap).includes(panel)) keymap[panel].classList.add("visible");
+        else keymap[panel].classList.remove("visible");
       });
     } else {
-      if (show) {
-        switch (panel) {
-          case "mobile_details":
-            mobile_details_panel_container.classList.add("visible");
-            break;
-          case "unit_conversion":
-            unit_conversion_panel_container.classList.add("visible");
-            break;
-          case "loading":
-            loading_panel_container.classList.add("visible");
-            break;
-          case "notification":
-            notification_panel_container.classList.add("visible");
-            break;
-        }
-      } else {
-        switch (panel) {
-          case "mobile_details":
-            mobile_details_panel_container.classList.remove("visible");
-            break;
-          case "unit_conversion":
-            unit_conversion_panel_container.classList.remove("visible");
-            break;
-          case "loading":
-            loading_panel_container.classList.remove("visible");
-            break;
-          case "notification":
-            notification_panel_container.classList.remove("visible");
-            break;
-        }
-      }
+      if (show && Object.keys(keymap).includes(panel)) keymap[panel].classList.add("visible");
+      else keymap[panel].classList.remove("visible");
     }
   }
   if (show_overlay) background_overlay.classList.add("visible");
@@ -262,139 +495,6 @@ function capitalize(string) {
     .join(" ");
 }
 
-// Initialization IIFE
-(() => {
-  // Add keyboard support
-  window.addEventListener("keydown", e => {
-    if (!e.key) return;
-    const pressed_key = e.key.toLowerCase();
-    if (pressed_key === "enter") search_button.click();
-  });
-  window.addEventListener("resize", update_screen_label);
-  update_screen_label();
-
-  // Fix elements' animation on initial load
-  window.onload = () => {
-    container.removeAttribute("style");
-  };
-
-  // Display locally cached weather data if available
-  const local_weather_data = JSON.parse(localStorage.getItem("weather_data"));
-  if (local_weather_data) {
-    weather_data = local_weather_data;
-    displayWeatherData(Weather.format(weather_data), forecast_list, true);
-  }
-
-  unit_conversion_button.addEventListener("click", () => {
-    manage_panels("unit_conversion");
-  });
-  unit_conversion_panel_done_button.addEventListener("click", () => {
-    manage_panels("unit_conversion", false, false);
-  });
-  unit_toggle_containers.forEach(unit_toggle_container => {
-    const siblings = [...unit_toggle_container.children];
-    const toggle_label = unit_toggle_container.dataset.unitToggle;
-    siblings.forEach((toggle, index) => {
-      toggle.addEventListener("click", () => {
-        if (toggle.classList.contains("selected")) return;
-        siblings.map(sibling => sibling.classList.remove("selected"));
-        toggle.classList.add("selected");
-        toggle_unit[toggle_label](index);
-      });
-    });
-  });
-
-  notification_dismiss_button.addEventListener("click", () => {
-    background_overlay.classList.remove("visible");
-    notification_panel_container.classList.remove("visible");
-  });
-
-  // Show suggestions after typing
-  search_input.addEventListener("input", () => {
-    const value = search_input.value.trim();
-    if (value.length < 3) return;
-    // Debounce the API call to avoid making a request for every keystroke
-    clearTimeout(timeout_id);
-    timeout_id = setTimeout(() => {
-      show_suggestions(value);
-    }, DEBOUNCE_DELAY);
-  });
-
-  search_button.addEventListener("click", () => {
-    const value = search_input.value.trim();
-    if (value && value.length > 0) {
-      loading_text_location_name.textContent = capitalize(value);
-      manage_panels("loading");
-      Weather.get(value)
-        .then(response => {
-          // Cache succesfully fetched weather data
-          localStorage.setItem("weather_data", JSON.stringify(response));
-          weather_data = response;
-          search_input.value = "";
-          forecast_list.dataset.day = 0;
-          forecast_list.dataset.hour = -1;
-          forecast_list.dataset.forecastList = -1;
-          forecast_list.dataset.selectedForecastType = "current";
-          displayWeatherData(Weather.format(response), forecast_list, true);
-          hourly_button.classList.remove("selected");
-          daily_button.classList.add("selected");
-          search_input.blur();
-          setTimeout(() => manage_panels("loading", false, false), 500);
-        })
-        .catch(error => {
-          console.error(error);
-          setTimeout(() => {
-            manage_panels("loading", false, true);
-            notification_text_location_name.textContent = capitalize(value);
-            manage_panels("notification", true, true);
-          }, 500);
-        });
-    }
-  });
-  clear_search_button.addEventListener("click", () => (search_input.value = ""));
-
-  mobile_details_button.addEventListener("click", () => {
-    manage_panels("mobile_details", true, false);
-  });
-  mobile_details_dismiss_button.addEventListener("click", () => {
-    manage_panels("mobile_details", false, false);
-  });
-
-  daily_button.addEventListener("click", () => {
-    if (daily_button.classList.contains("selected")) return;
-    [...forecast_list.children].map(child => child.classList.add("blinking"));
-    setTimeout(() => {
-      hourly_button.classList.remove("selected");
-      daily_button.classList.add("selected");
-      forecast_list.dataset.forecastList = 0;
-      display_weather_forecasts(Weather.format(weather_data), forecast_list);
-      const day_index = parseInt(forecast_list.dataset.day);
-      const selected_day = document.querySelector(`.forecast-item[data-index="${day_index}"]`);
-      if (selected_day) selected_day.scrollIntoView({ behavior: "smooth", inline: "center" });
-      [...forecast_list.children].map(child => child.classList.remove("blinking"));
-    }, BLINKING_TIME);
-  });
-  hourly_button.addEventListener("click", () => {
-    if (hourly_button.classList.contains("selected")) return;
-    [...forecast_list.children].map(child => child.classList.add("blinking"));
-    setTimeout(() => {
-      daily_button.classList.remove("selected");
-      hourly_button.classList.add("selected");
-      forecast_list.dataset.forecastList = 1;
-      display_weather_forecasts(Weather.format(weather_data), forecast_list, false);
-      const hour_index = parseInt(forecast_list.dataset.hour);
-      const selected_hour = document.querySelector(`.forecast-item[data-index="${hour_index}"]`);
-      if (selected_hour) selected_hour.scrollIntoView({ behavior: "smooth", inline: "center" });
-      else {
-        const date = new Date();
-        const current_hour = document.querySelector(`.forecast-item[data-index="${date.getHours()}"]`);
-        current_hour.scrollIntoView({ behavior: "smooth", inline: "center" });
-      }
-      [...forecast_list.children].map(child => child.classList.remove("blinking"));
-    }, BLINKING_TIME);
-  });
-})();
-
 function get_direction_text(degrees) {
   const index = Math.round(degrees / 45) % 8;
 
@@ -402,11 +502,21 @@ function get_direction_text(degrees) {
 }
 
 function animate_blink(element, callback = null) {
-  element.classList.add("blinking");
-  setTimeout(() => {
-    if (callback) callback(element);
-    element.classList.remove("blinking");
-  }, BLINKING_TIME);
+  if (Array.isArray(element)) {
+    element.forEach(element => {
+      element.classList.add("blinking");
+      setTimeout(() => {
+        if (callback) callback(element);
+        element.classList.remove("blinking");
+      }, BLINKING_TIME);
+    });
+  } else {
+    element.classList.add("blinking");
+    setTimeout(() => {
+      if (callback) callback(element);
+      element.classList.remove("blinking");
+    }, BLINKING_TIME);
+  }
 }
 
 function displayWeatherData(data, forecast_list_DOM_container, display_forecast_list = false) {
@@ -543,7 +653,7 @@ function displayWeatherData(data, forecast_list_DOM_container, display_forecast_
   function set_text_content(array_of_elements, array_of_text) {
     array_of_elements.forEach((element, index) => {
       element.forEach(element => {
-        if (element.textContent === (array_of_text[index]).toString()) return;
+        if (element.textContent === array_of_text[index].toString()) return;
         animate_blink(element, () => (element.textContent = array_of_text[index]));
       });
     });

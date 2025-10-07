@@ -32,9 +32,14 @@
           </button>
           <datalist id="search-suggestions"> </datalist>
         </div>
-        <button class="unit-conversion-button">
-          <img src="../assets/icons/unit-conversion.svg" alt="" class="unit-conversion-icon" draggable="false" />
-        </button>
+        <div class="current-location-search-unit-conversion-button-wrapper">
+          <button class="current-location-search-button">
+            <img src="../assets/icons/location.svg" alt="" class="allow-location-icon" draggable="false" />
+          </button>
+          <button class="unit-conversion-button">
+            <img src="../assets/icons/unit-conversion.svg" alt="" class="unit-conversion-icon" draggable="false" />
+          </button>
+        </div>
       </header>
       <main>
         <section class="selected-weather-forecast" data-visible-time>
@@ -383,6 +388,13 @@
               search or verify the spelling.
             </p>
             <button class="notification-dismiss-button">Dismiss</button>
+          </div>
+        </section>
+        <section class="location-notification-panel">
+          <div class="location-notification">
+            <h2 class="location-notification-heading">—</h2>
+            <p class="location-notification-text">—</p>
+            <button class="location-notification-dimiss-button">Dismiss</button>
           </div>
         </section>
       </main>
