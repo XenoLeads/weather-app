@@ -1047,7 +1047,7 @@ button {
   justify-content: space-around;
   align-items: center;
   height: 20rem;
-  width: 30rem;
+  flex: 1;
   border: 2px solid white;
   padding: 1rem 2rem;
   gap: 1rem;
@@ -1133,6 +1133,7 @@ button {
     border: 2px solid white;
     padding: 1rem;
     height: 100%;
+    width: auto;
     border-radius: var(--outline-radius);
     background-color: var(--outline-background-color);
     justify-content: flex-start;
@@ -1148,7 +1149,6 @@ button {
   }
   .desktop-details-section {
     display: flex;
-    flex: 1;
     height: 100%;
     border-radius: var(--outline-radius);
     background-color: var(--outline-background-color);
