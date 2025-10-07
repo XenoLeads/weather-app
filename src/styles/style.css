@@ -214,12 +214,23 @@ header {
   border: 2px solid white;
   border-radius: 50%;
   cursor: pointer;
+  padding: 0.4rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.25s ease;
 }
 .current-location-search-button:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
 .current-location-search-button:active {
+  transition: background-color 0.15s ease;
   background-color: rgba(255, 255, 255, 0.2);
+}
+.current-location-search-icon {
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
 }
 .location-notification-panel {
   position: fixed;
